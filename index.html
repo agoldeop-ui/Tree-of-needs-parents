@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tree of Needs — Unified</title>
+<title>Tree of Needs — Unified Parent Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -147,7 +147,7 @@
     <nav class="nav">
       <button class="nav-item" data-page="landing"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</button>
       <button class="nav-item" data-page="today"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Today</button>
-      <button class="nav-item" data-page="diagnostic"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>Diagnostic</button>
+      <button class="nav-item" data-page="diagnostic"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>Parent Quiz</button>
       <button class="nav-item" data-page="dark"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 5 5 5 9c0 2 1 4 3 5-2 1-3 3-3 5v3h14v-3c0-2-1-4-3-5 2-1 3-3 3-5 0-4-3-7-7-7z"/></svg>Dark needs</button>
       <button class="nav-item" data-page="play"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Play</button>
       <button class="nav-item" data-page="tree"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 5 5 5 9c0 2 1 4 3 5-2 1-3 3-3 5v3h14v-3c0-2-1-4-3-5 2-1 3-3 3-5 0-4-3-7-7-7z"/></svg>My Tree</button>
@@ -163,9 +163,8 @@
 
     <!-- PAGES -->
     <div class="page active" id="page-landing"><div id="landingContent"></div></div>
-    <div class="page" id="page-onboarding"><div class="onboarding" id="onboardingContent"></div></div>
     <div class="page" id="page-context">
-      <div class="today-hero"><h1>Who is taking this today?</h1><p>This tailors the language and the needs we surface. Nothing is stored anywhere.</p></div>
+      <div class="today-hero"><h1>Who is taking this today?</h1><p>This tailors the language and the needs we surface.</p></div>
       <div class="context-grid" id="contextGrid"></div>
     </div>
     <div class="page" id="page-today"><div id="todayBody"></div></div>
@@ -179,7 +178,7 @@
 
 <script>
 /* ============================================================
-   DATA (Needs Library, Contexts, Questions)
+   DATA
    ============================================================ */
 const LORDER = ["roots","trunk","branches","leaves","fruits"];
 const L = {roots:"Roots", trunk:"Trunk", branches:"Branches", leaves:"Leaves", fruits:"Fruits"};
@@ -192,50 +191,24 @@ const Ldesc = {
   fruits:"Contribution, meaning, and purpose"
 };
 
-const C = [
-  ["roots","Clean air and water","What the body takes in"],["roots","Nutritious food","Fuel you can rely on"],["roots","Rest and sleep","Real recovery, not collapse"],["roots","Physical safety","Free from threat"],["roots","Stability and consistency","Things stay reliable"],
-  ["trunk","Autonomy","Your own choices, shaping daily life"],["trunk","Authenticity","Alignment with your true self"],["trunk","Identity","A strong sense of who you are"],["trunk","Self-knowledge","Understanding your needs and motivations"],
-  ["branches","Emotional safety","Ability to express without judgment"],["branches","Recognition","Acknowledgment for your contribution"],["branches","Support","Help when needed"],["branches","Connection","Meaningful, authentic relationships"],["branches","Belonging","Being part of a community"],
-  ["leaves","Play","Spontaneous, unstructured activities"],["leaves","Relaxation","Time to decompress and reset"],["leaves","Fun","Joyful, exciting experiences"],["leaves","Production","Work, output, caretaking, expression"],
-  ["fruits","Purpose","Direction, mission, reasons for being"],["fruits","Growth","Developing skills, character, understanding"],["fruits","Fulfillment","Satisfaction from alignment with values"]
+/* THE EXACT PARENT QUESTIONS REQUESTED */
+const PARENT_QUIZ = [
+  { layer: "roots", text: "I'm so focused on my child's needs that I've stopped meeting my own." },
+  { layer: "roots", text: "Our home or routine feels chaotic — I can't get a stable footing." },
+  { layer: "roots", text: "I'm exhausted in a way that sleep doesn't fix." },
+  { layer: "trunk", text: "I've become 'mum' or 'dad' and lost the rest of who I am." },
+  { layer: "trunk", text: "I can't set a boundary with my child without feeling like a bad parent." },
+  { layer: "trunk", text: "I hide my own needs and feelings from my family." },
+  { layer: "branches", text: "I feel isolated — other parents don't seem to struggle the way I do." },
+  { layer: "branches", text: "I don't feel supported by my partner, my family, or my community." },
+  { layer: "branches", text: "I give endlessly and receive very little." },
+  { layer: "leaves", text: "I can't remember the last thing I did for myself." },
+  { layer: "leaves", text: "I feel like a machine that produces care." },
+  { layer: "leaves", text: "Rest feels impossible — there's always something." },
+  { layer: "fruits", text: "I'm so in the daily grind I've lost sight of the bigger picture." },
+  { layer: "fruits", text: "I don't feel like the parent I wanted to be." },
+  { layer: "fruits", text: "I can't connect to the meaning of this season." }
 ];
-
-const CONTEXTS = [
-  {id:"self", icon:"O", title:"Just me", desc:"A full, personal map"},
-  {id:"professional", icon:"P", title:"Professional", desc:"Work, boundaries, burnout"},
-  {id:"couple", icon:"C", title:"A couple", desc:"Two trees, one shared space"},
-  {id:"parent", icon:"F", title:"Parent & child", desc:"Care, patience, capacity"},
-  {id:"team", icon:"T", title:"Working team", desc:"Shared conditions, shared output"}
-];
-
-const DIAG_Q_SELF = [
-  {layer:"roots", text:"I'm tired in a way sleep doesn't fix."},{layer:"roots", text:"My body gets whatever is left after everything else."},{layer:"roots", text:"Home, money, or health feels shaky right now."},
-  {layer:"trunk", text:"I'm not sure what I actually want."},{layer:"trunk", text:"I say yes when I mean no."},{layer:"trunk", text:"I hide what I really think to keep the peace."},
-  {layer:"branches", text:"I feel lonely even around people."},{layer:"branches", text:"No one close to me really gets what's going on with me."},{layer:"branches", text:"I give more than I get back, and I'm keeping score."},
-  {layer:"leaves", text:"Resting feels like falling behind."},{layer:"leaves", text:"I can't remember the last time I did something just for fun."},{layer:"leaves", text:"I'm always doing, never just being."},
-  {layer:"fruits", text:"I'm going through the motions."},{layer:"fruits", text:"Nothing I do feels like it matters to anyone."},{layer:"fruits", text:"I don't know what I'm building toward."}
-];
-
-const DIAG_Q_BY_CONTEXT = {
-  self: DIAG_Q_SELF,
-  parent: [
-    {layer:"roots", text:"I'm so focused on my child's needs that I've stopped meeting my own."},
-    {layer:"roots", text:"Our home or routine feels chaotic — I can't get a stable footing."},
-    {layer:"roots", text:"I'm exhausted in a way that sleep doesn't fix."},
-    {layer:"trunk", text:"I've become 'mum' or 'dad' and lost the rest of who I am."},
-    {layer:"trunk", text:"I can't set a boundary with my child without feeling like a bad parent."},
-    {layer:"trunk", text:"I hide my own needs and feelings from my family."},
-    {layer:"branches", text:"I feel isolated — other parents don't seem to struggle the way I do."},
-    {layer:"branches", text:"I don't feel supported by my partner, my family, or my community."},
-    {layer:"branches", text:"I give endlessly and receive very little."},
-    {layer:"leaves", text:"I can't remember the last thing I did for myself."},
-    {layer:"leaves", text:"I feel like a machine that produces care."},
-    {layer:"leaves", text:"Rest feels impossible — there's always something."},
-    {layer:"fruits", text:"I'm so in the daily grind I've lost sight of the bigger picture."},
-    {layer:"fruits", text:"I don't feel like the parent I wanted to be."},
-    {layer:"fruits", text:"I can't connect to the meaning of this season."}
-  ]
-};
 
 const DARK_NEEDS = [
   { id: "control", title: "Control", desc: "The need to know what happens next.", shadow: "You micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
@@ -246,19 +219,15 @@ const DARK_NEEDS = [
 /* ============================================================
    STATE MANAGEMENT
    ============================================================ */
-const STORAGE_KEY = "needsTree.unified.v1";
+const STORAGE_KEY = "needsTree.parentQuiz.v1";
 
 let state = {
-  onboardStep: 0,
-  context: null,
   diagAnswers: new Array(15).fill(null),
   diagCurrent: 0,
   diagScores: null,
   diagStrained: null,
-  focusLayer: null,
   emergencyPicks: {roots:[],trunk:[],branches:[],leaves:[],fruits:[]},
   treeNeeds: {roots:[],trunk:[],branches:[],leaves:[],fruits:[]},
-  journal: []
 };
 
 function saveState() {
@@ -278,7 +247,6 @@ function loadState() {
 /* ============================================================
    HELPERS & NAVIGATION
    ============================================================ */
-function $(s){ return document.querySelector(s); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function navigateTo(pageId) {
@@ -289,10 +257,7 @@ function navigateTo(pageId) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === pageId));
   document.getElementById('sidebar').classList.remove('open');
   
-  // Render specific page content
   if(pageId === 'landing') renderLanding();
-  if(pageId === 'onboarding') renderOnboarding();
-  if(pageId === 'context') renderContext();
   if(pageId === 'diagnostic') renderDiagnostic();
   if(pageId === 'today') renderToday();
   if(pageId === 'tree') renderTree();
@@ -311,75 +276,19 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 });
 
 /* ============================================================
-   LANDING & ONBOARDING
+   LANDING
    ============================================================ */
 function renderLanding() {
-  const c = document.getElementById('landingContent');
-  c.innerHTML = `
+  document.getElementById('landingContent').innerHTML = `
     <div style="text-align:center;padding:40px 0">
       <h1>Find out which part of your life is starving.</h1>
-      <p class="sub" style="max-width:480px;margin:0 auto 24px">Answer 15 statements. Get a map of your needs, one small action for each thing that's starving, and the moment in your day you'll actually do it.</p>
-      <button class="btn btn-primary" onclick="navigateTo('onboarding')">Start the 15 statements</button>
-      <div style="margin-top:40px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:600px;margin-left:auto;margin-right:auto">
-        <h3>Sample Result</h3>
-        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:.9rem;color:var(--mute)">
-          <span>Roots</span> <span style="color:var(--c-strained)">10/12 · strained</span>
-        </div>
-        <div style="height:8px;background:var(--line);border-radius:4px;margin-top:4px;overflow:hidden">
-          <div style="width:83%;height:100%;background:var(--c-strained)"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:.9rem;color:var(--mute)">
-          <span>Trunk</span> <span style="color:var(--c-healthy)">3/12 · healthy</span>
-        </div>
-        <div style="height:8px;background:var(--line);border-radius:4px;margin-top:4px;overflow:hidden">
-          <div style="width:25%;height:100%;background:var(--c-healthy)"></div>
-        </div>
-      </div>
+      <p class="sub" style="max-width:480px;margin:0 auto 24px">Answer 15 statements about parenting. Get a map of your needs.</p>
+      <button class="btn btn-primary" onclick="startQuiz()">Start the 15 statements</button>
     </div>
   `;
 }
 
-function renderOnboarding() {
-  const slides = [
-    { title: "Being a human is overwhelming.", body: "Too many layers to hold at once. This is a map of what's actually starving — and what to feed first." },
-    { title: "Your needs are a tree.", body: "Roots feed everything. The trunk holds you upright. Branches reach outward. Leaves are seasonal output. Fruits appear when the tree is healthy." },
-    { title: "Two minutes.", body: "Answer 15 statements, see which layers are under strain, pick up to three emergencies, and leave with a plan." }
-  ];
-  const s = slides[state.onboardStep] || slides[0];
-  document.getElementById('onboardingContent').innerHTML = `
-    <div class="step-indicator">${slides.map((_,i) => `<div class="step-dot ${i === state.onboardStep ? 'active' : ''}"></div>`).join('')}</div>
-    <h1>${s.title}</h1>
-    <p>${s.body}</p>
-    <button class="btn btn-primary" onclick="nextOnboard()">${state.onboardStep < slides.length - 1 ? 'Continue' : 'Choose who is taking this'}</button>
-  `;
-}
-
-function nextOnboard() {
-  if(state.onboardStep < 2) {
-    state.onboardStep++;
-    renderOnboarding();
-  } else {
-    state.onboardStep = 0;
-    navigateTo('context');
-  }
-}
-
-/* ============================================================
-   CONTEXT & DIAGNOSTIC
-   ============================================================ */
-function renderContext() {
-  const g = document.getElementById('contextGrid');
-  g.innerHTML = CONTEXTS.map(c => `
-    <div class="context-card" onclick="selectContext('${c.id}')">
-      <div class="cc-icon">${c.icon}</div>
-      <div class="cc-title">${c.title}</div>
-      <div class="cc-desc">${c.desc}</div>
-    </div>
-  `).join('');
-}
-
-function selectContext(id) {
-  state.context = id;
+function startQuiz() {
   state.diagCurrent = 0;
   state.diagAnswers = new Array(15).fill(null);
   state.diagScores = null;
@@ -387,26 +296,28 @@ function selectContext(id) {
   navigateTo('diagnostic');
 }
 
+/* ============================================================
+   DIAGNOSTIC (PARENT QUIZ)
+   ============================================================ */
 function renderDiagnostic() {
   if(state.diagScores) {
     renderResults();
     return;
   }
   
-  const qs = DIAG_Q_BY_CONTEXT[state.context] || DIAG_Q_SELF;
   const c = document.getElementById('diagContent');
   
-  if(state.diagCurrent >= qs.length) {
+  if(state.diagCurrent >= PARENT_QUIZ.length) {
     computeDiagResult();
     return;
   }
   
-  const q = qs[state.diagCurrent];
-  const pct = (state.diagCurrent / qs.length) * 100;
+  const q = PARENT_QUIZ[state.diagCurrent];
+  const pct = (state.diagCurrent / PARENT_QUIZ.length) * 100;
   const labels = ["Not me","Rarely","Sometimes","Often","Very me"];
   
   c.innerHTML = `
-    <div class="today-hero"><h1>Which layer is starving?</h1><p>${qs.length} statements. Two minutes.</p></div>
+    <div class="today-hero"><h1>The Parent Quiz</h1><p>Statement ${state.diagCurrent + 1} of 15.</p></div>
     <div class="diag-progress"><div class="diag-bar" style="width:${pct}%"></div></div>
     <div class="diag-q">
       <div class="q-layer">${L[q.layer]}</div>
@@ -427,12 +338,20 @@ function answerDiag(val) {
 
 function computeDiagResult() {
   const scores = {roots:0, trunk:0, branches:0, leaves:0, fruits:0};
-  const qs = DIAG_Q_BY_CONTEXT[state.context] || DIAG_Q_SELF;
-  qs.forEach((q,i) => {
+  PARENT_QUIZ.forEach((q,i) => {
     if(state.diagAnswers[i] !== null) scores[q.layer] += state.diagAnswers[i];
   });
   state.diagScores = scores;
+  
+  let max = -1;
+  let strained = "roots";
+  LORDER.forEach(l => {
+    if(scores[l] > max) { max = scores[l]; strained = l; }
+  });
+  state.diagStrained = strained;
+  
   saveState();
+  renderDiagnostic();
 }
 
 /* ============================================================
@@ -441,11 +360,10 @@ function computeDiagResult() {
 function renderResults() {
   const c = document.getElementById('diagContent');
   const scores = state.diagScores;
-  const fl = LORDER.slice().sort((a,b) => scores[b] - scores[a])[0];
   
   c.innerHTML = `
     <div class="results-container">
-      <div class="today-hero"><h1>Your Needs Tree, this season.</h1><p>Take a look at the state of your tree.</p></div>
+      <div class="today-hero"><h1>Your Needs Tree</h1><p>Based on your parent quiz answers.</p></div>
       <div class="tree-state">
         ${LORDER.slice().reverse().map(l => {
           const sc = scores[l];
@@ -463,7 +381,8 @@ function renderResults() {
         }).join('')}
       </div>
       <div class="action-row">
-        <button class="btn btn-primary" onclick="navigateTo('tree')">Open my tree →</button>
+        <button class="btn btn-primary" onclick="navigateTo('tree')">See My Tree →</button>
+        <button class="btn btn-outline" onclick="startQuiz()">Retake Quiz</button>
       </div>
     </div>
   `;
@@ -471,7 +390,6 @@ function renderResults() {
 
 function renderTree() {
   const c = document.getElementById('treeMapContainer');
-  const scores = state.diagScores || {roots:0, trunk:0, branches:0, leaves:0, fruits:0};
   
   c.innerHTML = `
     <div class="today-hero"><h1>Your Personal Tree</h1><p>Mark what's missing, not what you have.</p></div>
@@ -484,7 +402,6 @@ function renderTree() {
             <div class="chip-grid">
               ${needs.length ? needs.map(n => `<span class="chip on" style="background:${Lcolor[l]};border-color:${Lcolor[l]};color:#fff">${esc(n)}</span>`).join('') : `<span style="color:var(--mute);font-size:.9rem;font-style:italic">No needs added yet.</span>`}
             </div>
-            <button class="btn btn-outline btn-small" style="margin-top:8px" onclick="openAddNeed('${l}')">+ Add a need</button>
           </div>
         `;
       }).join('')}
@@ -493,7 +410,7 @@ function renderTree() {
 }
 
 /* ============================================================
-   DARK NEEDS
+   DARK NEEDS, PLAY, TODAY, JOURNAL
    ============================================================ */
 function renderDark() {
   const c = document.getElementById('darkBody');
@@ -506,47 +423,35 @@ function renderDark() {
           <p style="font-size:.9rem;color:var(--mute);margin-bottom:8px">${dn.desc}</p>
           <div class="shadow"><strong>Shadow:</strong> ${dn.shadow}</div>
           <div class="integrated"><strong>Integrated:</strong> ${dn.integrated}</div>
-          <button class="btn btn-outline btn-small" style="margin-top:12px" onclick="alert('Added to your focus')">This is me</button>
         </div>
       `).join('')}
     </div>
   `;
 }
 
-/* ============================================================
-   PLAY (Games)
-   ============================================================ */
 function renderPlay() {
   const c = document.getElementById('playContent');
   c.innerHTML = `
     <div class="today-hero"><h1>Play</h1><p>These are the games that made the deck.</p></div>
     <div class="game-grid">
-      <div class="game-card live" onclick="alert('Sort it: Deal 15 cards into Nice, Painful, Non-negotiable, Emergency.')">
+      <div class="game-card live" onclick="alert('Sort it: Deal 15 cards into categories.')">
         <div class="gc-title">Sort it</div>
         <div class="gc-pitch">Deal 15 cards at random. Sort them into categories. Only three may be emergencies.</div>
         <div style="color:var(--gold);font-weight:600">Start →</div>
       </div>
-      <div class="game-card live" onclick="alert('Say it out loud: I need ___, and what I usually do instead is ___.')">
+      <div class="game-card live" onclick="alert('Say it out loud: I need ___.')">
         <div class="gc-title">Say it out loud</div>
         <div class="gc-pitch">Draw one card. Say to them: I need ___, and what I usually do instead is ___.</div>
-        <div style="color:var(--gold);font-weight:600">Start →</div>
-      </div>
-      <div class="game-card live" onclick="alert('Guess the need: Three strategies. Which core need is hiding?')">
-        <div class="gc-title">Guess the need</div>
-        <div class="gc-pitch">You're dealt three strategies — real sentences people say when a need is hiding.</div>
         <div style="color:var(--gold);font-weight:600">Start →</div>
       </div>
     </div>
   `;
 }
 
-/* ============================================================
-   TODAY & JOURNAL
-   ============================================================ */
 function renderToday() {
   const c = document.getElementById('todayBody');
   if(!state.diagScores) {
-    c.innerHTML = `<div class="today-hero"><h1>Start with the diagnostic</h1><p>Fifteen statements. Two minutes.</p><button class="btn btn-primary" onclick="navigateTo('diagnostic')">Take the diagnostic</button></div>`;
+    c.innerHTML = `<div class="today-hero"><h1>Start with the diagnostic</h1><p>Fifteen statements. Two minutes.</p><button class="btn btn-primary" onclick="startQuiz()">Take the quiz</button></div>`;
     return;
   }
   
@@ -581,7 +486,7 @@ function renderJournal() {
     <div class="today-hero"><h1>Your Reflections</h1><p>Write what it stirs. Come back to see what shifts.</p></div>
     <div style="max-width:600px;margin:0 auto">
       <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;margin-bottom:20px">
-        <textarea placeholder="Write your reflection..." style="margin-bottom:12px"></textarea>
+        <textarea placeholder="Write your reflection..."></textarea>
         <button class="btn btn-primary" onclick="alert('Saved to journal')">Save reflection</button>
       </div>
     </div>
