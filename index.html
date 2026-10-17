@@ -3,22 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tree of Needs — Session Flow + Certificates</title>
+<title>Tree of Needs — Facilitator & Participant</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0A0E14;--card:#111A24;--gold:#F2A65A;--gl:#FFCF96;--cy:#00E5FF;--warn:#E08A9A;--ink:#E6EEF5;--mute:#7A8D9C;--line:#1F2C3A;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  :root{
+    --bg:#0A0E14;--card:#111A24;--gold:#F2A65A;--gl:#FFCF96;--cy:#00E5FF;--warn:#E08A9A;--ink:#E6EEF5;--mute:#7A8D9C;--line:#1F2C3A;
+    --c-roots:#6B7F94;--c-trunk:#5B8FB9;--c-branches:#4A9DB8;--c-leaves:#7BA8C4;--c-fruits:#7A6B9C;
+    --radius:12px;--radius-sm:8px;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+  }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font:15px/1.5 'Public Sans',system-ui,sans-serif;padding:16px;max-width:820px;margin:auto}
   h1,h2,h3{font-family:'Fraunces',serif;font-weight:600}
   h1{color:var(--gl);font-size:1.6rem}
   .sub{color:var(--mute);font-size:.85rem;margin:4px 0 14px}
-  .tabs{display:flex;gap:8px;margin:12px 0;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+  
+  .tabs{display:flex;gap:8px;margin:12px 0;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;flex-wrap:wrap}
   .tabs button,.btn{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:8px 16px;font:inherit;cursor:pointer;transition:all 0.2s}
   .tabs button.on,.btn.p{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
-  .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  
   input,textarea,select{width:100%;background:#0d141c;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit}
   textarea{min-height:60px;resize:vertical}
   label{display:block;font-size:.75rem;color:var(--cy);margin:10px 0 3px;text-transform:uppercase;letter-spacing:.06em}
+  
+  /* Facilitator Accordion */
   details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
   summary{padding:12px 14px;cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:8px}
   summary small{color:var(--mute);font-weight:400}
@@ -28,27 +36,72 @@
   .if{font-size:.85rem;color:var(--warn)}
   .done{display:flex;gap:6px;align-items:center;margin-top:10px;font-size:.85rem}
   .done input{width:auto}
-  .hide{display:none}
+  .opt-track{background:rgba(0,229,255,0.04);border:1px dashed var(--cy);border-radius:8px;padding:10px;margin:10px 0;font-size:.85rem}
+  .refl-note{background:rgba(122,141,156,0.08);border-left:3px solid var(--mute);padding:8px 12px;margin:8px 0;font-size:.88rem;color:var(--ink)}
+  .refl-note .refl-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:600;margin-bottom:3px}
   
-  /* Participant Tree UI */
-  .tree-container{margin-top:20px}
-  .tree-layer{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all 0.2s}
-  .tree-layer:hover{border-color:var(--layer-color)}
-  .tree-layer h3{font-size:1.2rem;color:var(--layer-color);margin-bottom:4px}
-  .tree-layer .desc{font-size:0.85rem;color:var(--mute);margin-bottom:10px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chip{padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--line);font-size:0.8rem}
-  .chip.on{background:var(--cy);color:#000;border-color:var(--cy)}
-  .chip.custom{border-color:var(--gold);color:var(--gold)}
+  /* Guided Participant UI */
+  .hide{display:none !important}
+  .guide-container{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:20px}
   
-  /* Bottom Sheet */
-  .sheet{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+  /* Stage 1: The Tree Drawing */
+  .tree-canvas-wrap{width:100%;max-width:600px;margin:0 auto;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#05080c}
+  .tree-layer-btn{position:absolute;cursor:pointer;transition:all 0.3s;border-radius:8px;border:2px solid transparent;background:rgba(0,0,0,0.3);backdrop-filter:blur(2px)}
+  .tree-layer-btn:hover{border-color:var(--gl);background:rgba(242,166,90,0.2)}
+  .tree-layer-btn span{display:block;text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:0.9rem;color:#fff;text-shadow:0 1px 3px #000;padding:8px 4px}
+  
+  /* Stage 2: Own Words */
+  .own-words-box{background:rgba(242,166,90,0.06);border:1px solid rgba(242,166,90,0.3);border-radius:10px;padding:20px}
+  .own-words-box label{color:var(--gold);font-size:0.9rem;text-transform:none;letter-spacing:0;margin-bottom:10px}
+  .own-words-box textarea{min-height:120px;background:#000;border-color:rgba(242,166,90,0.4);font-size:1.05rem;line-height:1.6}
+  
+  /* Stage 3 & 4: Cards & Tree */
+  .chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+  .chip{padding:10px 16px;border-radius:20px;background:var(--bg);border:1px solid var(--line);font-size:0.9rem;cursor:pointer;transition:all 0.2s}
+  .chip:hover{border-color:var(--cy)}
+  .chip.on{background:var(--cy);color:#000;border-color:var(--cy);font-weight:600}
+  .chip.on.present{background:var(--gold);border-color:var(--gold)}
+  .chip.on.missing{background:var(--warn);border-color:var(--warn);color:#fff}
+  
+  .drop-layer{background:var(--bg);border:2px dashed var(--line);border-radius:12px;padding:16px;margin-bottom:12px;transition:all 0.2s}
+  .drop-layer.drag-over{border-color:var(--gl);background:rgba(242,166,90,0.05)}
+  .drop-layer h4{color:var(--layer-color);font-size:1.1rem;margin-bottom:8px;display:flex;justify-content:space-between}
+  .drop-layer h4 span{font-size:0.8rem;color:var(--mute);font-weight:400}
+  .drop-layer .chips{min-height:40px;display:flex;flex-wrap:wrap;gap:6px}
+  .drop-layer .chip{background:var(--card);cursor:grab}
+  
+  /* Stage 5: Parent Quiz */
+  .quiz-q{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+  .quiz-q p{font-size:1.05rem;margin-bottom:12px}
+  .scale{display:flex;gap:8px}
+  .scale button{flex:1;padding:10px 4px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:0.85rem;cursor:pointer;transition:all 0.2s;text-align:center}
+  .scale button:hover{border-color:var(--cy)}
+  .scale button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+  .quiz-scores{display:flex;flex-direction:column;gap:8px;margin:20px 0;background:var(--bg);padding:16px;border-radius:10px}
+  .quiz-score-row{display:flex;align-items:center;gap:10px;font-size:0.9rem}
+  .quiz-score-row b{width:80px;flex:none}
+  .quiz-score-row .bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+  .quiz-score-row .bar div{height:100%;border-radius:4px;transition:width 1s ease}
+  
+  /* Stage 6: Flinch */
+  .flinch-card{border:1px solid var(--warn);border-radius:10px;padding:16px;margin-bottom:12px;background:rgba(224,138,154,0.05)}
+  .flinch-card h3{color:var(--warn);font-size:1.1rem;margin-bottom:4px}
+  .flinch-card p{font-size:0.9rem;color:var(--mute);margin-bottom:10px}
+  .flinch-card .shadow{color:var(--warn);font-size:0.85rem;margin-bottom:6px;padding-left:10px;border-left:2px solid var(--warn)}
+  .flinch-card .integrated{color:var(--cy);font-size:0.85rem;padding-left:10px;border-left:2px solid var(--cy)}
+  
+  /* Stage 7: Anchor */
+  .anchor-box textarea{min-height:100px;font-family:'Fraunces',serif;font-size:1.1rem}
+  
+  /* Navigation */
+  .nav{display:flex;gap:10px;margin-top:20px}
+  .nav .btn{flex:1;justify-content:center;padding:12px;font-size:1rem}
+  
+  /* Modal / Sheet */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
   .sheet.show{display:flex}
   .sheet-content{background:var(--card);width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:20px;max-height:85vh;overflow-y:auto;border-top:1px solid var(--line)}
   .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .need-opt{display:inline-block;padding:6px 12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,0.2);margin:4px;font-size:0.85rem;transition:all 0.2s}
-  .need-opt:hover{border-color:var(--cy)}
-  .need-opt.on{background:var(--cy);color:#000;border-color:var(--cy)}
   
   /* Certificates */
   .cert{background:radial-gradient(circle at 50% 0,rgba(242,166,90,.08),transparent 60%),var(--bg);border:1px solid var(--line);border-radius:6px;padding:28px 20px;margin-bottom:20px}
@@ -56,60 +109,239 @@
   .cert .q{text-align:center;color:var(--mute);font-style:italic;margin-bottom:18px}
   .ly{display:flex;gap:12px;margin-bottom:8px}
   .ly b{width:84px;flex:none;text-align:right;font-family:'Fraunces',serif;color:var(--c)}
-  .ly div{flex:1;border-left:2px solid var(--c);padding:6px 12px;background:rgba(255,255,255,.02);min-height:34px}
-  .anchor{background:rgba(242,166,90,.06);border:1px solid rgba(242,166,90,.25);border-radius:8px;padding:16px;margin:18px 0;font-family:'Fraunces',serif;color:var(--gl);font-style:italic;font-size:1.15rem}
-  .anchor small{display:block;font:600 .7rem 'Public Sans';text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-style:normal}
+  .ly div{flex:1;border-left:2px solid var(--c);padding:6px 12px;background:rgba(255,255,255,.02);min-height:34px;font-size:0.9rem}
+  .anchor-display{background:rgba(242,166,90,.06);border:1px solid rgba(242,166,90,.25);border-radius:8px;padding:16px;margin:18px 0;font-family:'Fraunces',serif;color:var(--gl);font-style:italic;font-size:1.15rem}
+  .anchor-display small{display:block;font:600 .7rem 'Public Sans';text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-style:normal;margin-bottom:6px}
   .fb{border:1px solid var(--warn);border-radius:8px;padding:14px;margin-bottom:10px}
   .fb h3{color:var(--warn);font-size:1rem;margin-bottom:6px}
-  .part{color:var(--cy);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;border-bottom:1px solid var(--line);padding:14px 0 6px;margin-bottom:8px}
-  .kv{margin:6px 0}.kv b{color:var(--gold);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;display:block}
   .ft{text-align:center;color:var(--mute);font-size:.8rem;margin-top:16px}
-  .e{color:var(--mute);opacity:.6;font-style:italic}
-  @media print{body{background:#fff;color:#000}.tabs,.noprint,#flow{display:none!important}.cert{background:#fff;border:0;color:#000;page-break-after:always}.cert h2,.anchor,.part,.kv b,.ly b{color:#000}.ly div{background:#f6f6f6}}
+  
+  @media print{body{background:#fff;color:#000}.tabs,.noprint,#flow{display:none!important}.cert{background:#fff;border:0;color:#000;page-break-after:always}.cert h2,.anchor-display,.part,.kv b,.ly b{color:#000}.ly div{background:#f6f6f6}}
 </style>
 </head>
 <body>
 
 <h1>Tree of Needs</h1>
-<p class="sub">Facilitator companion: session flow, data capture, and two certificates. Use participant codes, not names.</p>
+<p class="sub">Facilitator companion & guided participant session.</p>
 
-<div class="tabs">
+<div class="tabs noprint">
   <button id="t1" class="on" onclick="sw(1)">Session flow</button>
-  <button id="t2" onclick="sw(2)">Participant Screen</button>
+  <button id="t2" onclick="sw(2)">Participant (Guided)</button>
   <button id="t3" onclick="sw(3)">Certificates</button>
 </div>
 
+<!-- ===================== TAB 1: FACILITATOR FLOW ===================== -->
 <div id="flow"></div>
 
-<!-- ===================== PARTICIPANT VIEW ===================== -->
+<!-- ===================== TAB 2: GUIDED PARTICIPANT ===================== -->
 <div id="participant" class="hide">
-  <div id="mum-tree">
-    <h2 style="color:var(--gold);margin-bottom:8px;">Your Tree</h2>
-    <p class="sub">Tap a layer to add what is true today.</p>
-    <div id="mum-tree-container" class="tree-container"></div>
-    <div class="tree-layer" style="border-color:var(--warn)" onclick="openSheet('misfit')">
-      <h3 style="color:var(--warn)">Things that don't fit</h3>
-      <p class="desc">If something doesn't belong in the layers above, tap here.</p>
-      <div class="chips" id="misfit-chips"></div>
+  
+  <!-- Stage 1: The Tree -->
+  <div id="p-stage-1" class="guide-container">
+    <h2 style="color:var(--gl);margin-bottom:8px;text-align:center">Your Tree</h2>
+    <p class="sub" style="text-align:center;margin-bottom:20px">Tap any part of the tree to learn what it holds. This is just for you.</p>
+    
+    <div class="tree-canvas-wrap">
+      <!-- Custom SVG Tree mimicking the provided artwork style -->
+      <svg viewBox="0 0 600 600" style="width:100%;display:block">
+        <defs>
+          <radialGradient id="sun" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stop-color="#FFE5A3" stop-opacity="0.8"/>
+            <stop offset="60%" stop-color="#B5A642" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#0A0E14" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="bark" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1A2416"/>
+            <stop offset="30%" stop-color="#3E5230"/>
+            <stop offset="70%" stop-color="#2A381F"/>
+            <stop offset="100%" stop-color="#11180E"/>
+          </linearGradient>
+          <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4B6B30"/>
+            <stop offset="100%" stop-color="#1E2E14"/>
+          </linearGradient>
+        </defs>
+        
+        <!-- Background / Sun -->
+        <rect width="600" height="600" fill="#0A0E14"/>
+        <circle cx="300" cy="200" r="300" fill="url(#sun)"/>
+        
+        <!-- Silhouettes in background -->
+        <path d="M 150 450 Q 200 400 250 420 Q 280 380 300 350 Q 320 380 350 420 Q 400 400 450 450 Z" fill="#1A2416" opacity="0.6"/>
+        
+        <!-- Trunk -->
+        <path d="M 250 600 Q 220 450 240 300 L 360 300 Q 380 450 350 600 Z" fill="url(#bark)"/>
+        
+        <!-- Branches -->
+        <path d="M 240 300 Q 150 250 100 150 L 130 140 Q 180 230 260 280 Z" fill="url(#bark)"/>
+        <path d="M 360 300 Q 450 250 500 150 L 470 140 Q 420 230 340 280 Z" fill="url(#bark)"/>
+        
+        <!-- Leaves/Canopy -->
+        <ellipse cx="120" cy="120" rx="120" ry="80" fill="url(#leaf)"/>
+        <ellipse cx="480" cy="120" rx="120" ry="80" fill="url(#leaf)"/>
+        <ellipse cx="300" cy="80" rx="180" ry="100" fill="url(#leaf)"/>
+        
+        <!-- Fruits (small glowing dots) -->
+        <circle cx="200" cy="160" r="6" fill="#F2A65A"/>
+        <circle cx="400" cy="140" r="8" fill="#F2A65A"/>
+        <circle cx="300" cy="110" r="7" fill="#F2A65A"/>
+        <circle cx="150" cy="180" r="5" fill="#F2A65A"/>
+        <circle cx="450" cy="180" r="6" fill="#F2A65A"/>
+      </svg>
+
+      <!-- Interactive Overlays -->
+      <div class="tree-layer-btn" style="top:75%;left:35%;width:30%" onclick="showLayerInfo('roots')">
+        <span>Roots</span>
+      </div>
+      <div class="tree-layer-btn" style="top:50%;left:38%;width:24%" onclick="showLayerInfo('trunk')">
+        <span>Trunk</span>
+      </div>
+      <div class="tree-layer-btn" style="top:35%;left:10%;width:25%" onclick="showLayerInfo('branches')">
+        <span>Branches</span>
+      </div>
+      <div class="tree-layer-btn" style="top:35%;left:65%;width:25%" onclick="showLayerInfo('branches')">
+        <span>Branches</span>
+      </div>
+      <div class="tree-layer-btn" style="top:15%;left:15%;width:20%" onclick="showLayerInfo('leaves')">
+        <span>Leaves</span>
+      </div>
+      <div class="tree-layer-btn" style="top:15%;left:65%;width:20%" onclick="showLayerInfo('leaves')">
+        <span>Leaves</span>
+      </div>
+      <div class="tree-layer-btn" style="top:2%;left:40%;width:20%" onclick="showLayerInfo('fruits')">
+        <span>Fruits</span>
+      </div>
     </div>
-    <button class="btn p" style="width:100%;margin-top:20px" onclick="showDarkNeeds()">Next: The Flinch</button>
+    
+    <div class="nav">
+      <button class="btn p" onclick="pNav(2)">I've seen enough →</button>
+    </div>
   </div>
 
-  <div id="mum-dark" class="hide">
-    <h2 style="color:var(--gold);margin-bottom:8px;">The Flinch</h2>
-    <p class="sub">Some needs look ugly from the outside. Choose the two that resonate with you.</p>
-    <div id="dark-needs-list"></div>
-    <button class="btn p" style="width:100%;margin-top:20px" onclick="finishParticipant()">Finish</button>
+  <!-- Stage 2: Own Words -->
+  <div id="p-stage-2" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">In your own words</h2>
+    <p class="sub" style="margin-bottom:20px">Before we look at categories, what has been taking up most of your attention or energy lately?</p>
+    <div class="own-words-box">
+      <textarea id="ownWordsInput" data-k="ownWords" placeholder="A few sentences is enough. Don't worry about fitting it into a box yet."></textarea>
+    </div>
+    <div class="nav">
+      <button class="btn" onclick="pNav(1)">Back</button>
+      <button class="btn p" id="btnStage2Next" disabled onclick="pNav(3)">Next</button>
+    </div>
   </div>
 
-  <div id="mum-cert" class="hide">
+  <!-- Stage 3: Soft Dive -->
+  <div id="p-stage-3" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">The Soft Dive</h2>
+    <p class="sub" style="margin-bottom:20px">Here are four cards. Tap to mark if they feel <strong>present</strong> or <strong>missing</strong> right now.</p>
+    
+    <div class="chip-grid" id="softDiveGrid">
+      <!-- Populated by JS -->
+    </div>
+    
+    <p class="sub" style="margin-top:30px">Do you want to look at the deeper layers too (Roots and Trunk), or stay here?</p>
+    <div class="nav">
+      <button class="btn" onclick="pNav(2)">Back</button>
+      <button class="btn p" onclick="pNav(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Stage 4: Build the Tree -->
+  <div id="p-stage-4" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">Build your tree</h2>
+    <p class="sub" style="margin-bottom:20px">Place what belongs. You can put something in more than one layer, or nowhere at all.</p>
+    
+    <div id="treeDropZones">
+      <!-- Populated by JS -->
+    </div>
+    
+    <div class="nav">
+      <button class="btn" onclick="pNav(3)">Back</button>
+      <button class="btn p" onclick="pNav(5)">Next: The Quiz</button>
+    </div>
+  </div>
+
+  <!-- Stage 5: The Parent Quiz -->
+  <div id="p-stage-5" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">The Quiz</h2>
+    <p class="sub" style="margin-bottom:20px">Now that your tree is built, do these statements fit what you found?</p>
+    
+    <div id="quizContainer">
+      <!-- Populated by JS -->
+    </div>
+    
+    <div id="quizResult" class="hide">
+      <h3 style="color:var(--gold);margin-bottom:12px">Here's what you said.</h3>
+      <p class="sub" style="margin-bottom:20px">These are your answers, not a verdict. Which of these feels most true to you right now?</p>
+      <div class="quiz-scores" id="quizScores">
+        <!-- Populated by JS -->
+      </div>
+      <div class="nav">
+        <button class="btn" onclick="resetQuiz()">Go back and adjust</button>
+        <button class="btn p" onclick="pNav(6)">Next →</button>
+      </div>
+    </div>
+    
+    <div class="nav" id="quizNav">
+      <button class="btn" onclick="pNav(4)">Back</button>
+      <button class="btn p" id="btnQuizNext" disabled onclick="showQuizResult()">See results</button>
+    </div>
+  </div>
+
+  <!-- Stage 6: The Flinch -->
+  <div id="p-stage-6" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">The Flinch</h2>
+    <p class="sub" style="margin-bottom:20px">Some needs look ugly from the outside. These are not bad needs — they are often protections. Choose up to two that resonate, or skip.</p>
+    
+    <div id="flinchContainer">
+      <!-- Populated by JS -->
+    </div>
+    
+    <div class="nav">
+      <button class="btn" onclick="pNav(5)">Back</button>
+      <button class="btn p" onclick="pNav(7)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Stage 7: The Anchor -->
+  <div id="p-stage-7" class="guide-container hide">
+    <h2 style="color:var(--gl);margin-bottom:8px">The Anchor</h2>
+    <p class="sub" style="margin-bottom:20px">What would "enough" look like for you this season? Not perfect. Not permanent. Enough.</p>
+    
+    <div class="anchor-box" style="margin-bottom:20px">
+      <textarea data-k="enough" placeholder="How would you recognise it in everyday life?"></textarea>
+    </div>
+    
+    <div class="nav">
+      <button class="btn" onclick="pNav(6)">Back</button>
+      <button class="btn p" onclick="pNav(8)">Finish</button>
+    </div>
+  </div>
+
+  <!-- Stage 8: Certificate -->
+  <div id="p-stage-8" class="guide-container hide">
     <h2 style="color:var(--gold);margin-bottom:16px;text-align:center">Your Certificate</h2>
     <p class="sub" style="text-align:center">Screenshot this to keep it.</p>
     <div id="cert-preview"></div>
+    <div class="nav">
+      <button class="btn" onclick="pNav(7)">Back</button>
+      <button class="btn p" onclick="window.print()">Print / Save PDF</button>
+    </div>
   </div>
+
 </div>
 
-<!-- ===================== BOTTOM SHEET ===================== -->
+<!-- ===================== TAB 3: CERTIFICATES ===================== -->
+<div id="certs" class="hide">
+  <div class="noprint" style="margin-bottom:20px">
+    <button class="btn p" onclick="print()">Print / Save as PDF</button>
+    <button class="btn" onclick="if(confirm('Clear participant data?')){localStorage.removeItem('ton.participant.v1');location.reload()}">Clear participant data</button>
+  </div>
+  <div id="out"></div>
+</div>
+
+<!-- ===================== BOTTOM SHEET (For Add Need) ===================== -->
 <div class="sheet" id="sheet" onclick="closeSheet(event)">
   <div class="sheet-content" onclick="event.stopPropagation()">
     <div class="sheet-head">
@@ -117,261 +349,451 @@
       <button class="btn" onclick="closeSheet(event)">Done</button>
     </div>
     <input type="text" id="sheet-search" placeholder="Search all needs or type your own..." onkeyup="filterNeeds()" onkeypress="addCustomNeed(event)">
-    <div id="sheet-needs-container" style="margin-top:12px"></div>
+    <div id="sheet-needs-container" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;"></div>
   </div>
-</div>
-
-<div id="certs" class="hide">
-  <div class="noprint">
-    <div class="row">
-      <button class="btn p" onclick="print()">Print / Save as PDF</button>
-      <button class="btn" onclick="if(confirm('Clear all data?')){S={};save();location.reload()}">Clear data</button>
-    </div>
-  </div>
-  <div id="out"></div>
 </div>
 
 <script>
-  // --- THE NEEDS LIBRARY ---
-  const NEEDS_LIBRARY = {
-    roots: ["Clean air and water", "Nutritious food", "Rest and sleep", "Shelter", "Access to shelter", "Physical safety", "Stability and consistency", "Health", "Access to healthcare", "Sensory comfort", "Movement and exercise", "Sunlight", "Freedom from pain", "Sexual needs / intimacy"],
-    trunk: ["Autonomy", "Independence", "Authenticity", "Integrity", "Freedom", "Self-expression", "Self-knowledge", "Privacy", "Identity", "Consent", "Identity affirmation", "Self-advocacy", "Understanding", "Clarity", "Learning and growth", "Challenge", "Creativity", "Stimulation", "Inspiration", "Curiosity", "Meaning-making", "Structure", "Mastery"],
-    branches: ["Emotional safety", "Recognition", "Acceptance", "Validation", "Affection", "Support", "Companionship", "Empathy", "Trust", "Belonging", "Mutuality", "Connection", "Intimacy", "Love", "Compassion", "Peer community", "Freedom from ableism", "Mentorship", "Social flexibility"],
-    leaves: ["Play", "Humor", "Leisure", "Relaxation", "Fun", "Beauty", "Adventure", "Celebration", "Playful creativity", "Production"],
-    fruits: ["Purpose", "Contribution", "Impact", "Growth", "Fulfillment", "Service", "Spirituality", "Gratitude", "Transcendence"],
-    misfit: ["Rest and sleep", "Connection", "Identity", "Purpose", "Support"]
-  };
+/* ============================================================
+   DATA & STATE
+   ============================================================ */
+const NEEDS_LIBRARY = {
+  roots: ["Clean air and water", "Nutritious food", "Rest and sleep", "Shelter", "Physical safety", "Stability and consistency", "Health", "Access to healthcare", "Sensory comfort", "Movement and exercise", "Sunlight", "Freedom from pain"],
+  trunk: ["Autonomy", "Independence", "Authenticity", "Integrity", "Freedom", "Self-expression", "Self-knowledge", "Privacy", "Identity", "Consent", "Self-advocacy", "Understanding", "Clarity", "Learning and growth", "Challenge", "Creativity", "Structure", "Mastery"],
+  branches: ["Emotional safety", "Recognition", "Acceptance", "Validation", "Affection", "Support", "Companionship", "Empathy", "Trust", "Belonging", "Mutuality", "Connection", "Intimacy", "Love", "Compassion", "Peer community", "Mentorship"],
+  leaves: ["Play", "Humor", "Leisure", "Relaxation", "Fun", "Beauty", "Adventure", "Celebration", "Playful creativity", "Production"],
+  fruits: ["Purpose", "Contribution", "Impact", "Growth", "Fulfillment", "Service", "Spirituality", "Gratitude", "Transcendence"],
+  misfit: ["Rest and sleep", "Connection", "Identity", "Purpose", "Support"]
+};
 
-  const DARK_NEEDS = [
-    { id: "control", title: "Control", desc: "The need to know what happens next.", shadow: "You micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
-    { id: "attention", title: "Attention", desc: "The need for someone to register you exist.", shadow: "You post provocatively or go silent hoping someone notices.", integrated: "Say it plainly: 'I need twenty minutes of your attention.'" },
-    { id: "anger", title: "Anger", desc: "The need to push back. Anger shows where your limits are.", shadow: "You snap at a dirty dishwasher or swallow it until you get headaches.", integrated: "Name it early: 'I'm getting annoyed. I need a minute.'" },
-    { id: "freedom", title: "Freedom from Responsibility", desc: "The need to put it down.", shadow: "You ignore bills for months or carry everything until you resent everyone.", integrated: "Pick the oldest thing you're avoiding and do five minutes of it." },
-    { id: "dependency", title: "Dependency", desc: "The need to rely on someone.", shadow: "You text 'are you mad at me?' after a short reply.", integrated: "Tell one person a real problem and say what you need." },
-    { id: "specialness", title: "Specialness", desc: "The need to feel like more than the crowd.", shadow: "You feel a sting when a friend succeeds.", integrated: "Choose one skill and practise it with no audience." }
-  ];
+const LY = [
+  { id: "fruits", name: "Fruits", color: "#8A7BAE", desc: "Purpose, contribution, growth" },
+  { id: "leaves", name: "Leaves", color: "#6E9AB8", desc: "Play, leisure, humor, production" },
+  { id: "branches", name: "Branches", color: "#3B8EA8", desc: "Connection, support, recognition, belonging" },
+  { id: "trunk", name: "Trunk", color: "#4A82B3", desc: "Identity, autonomy, understanding, structure" },
+  { id: "roots", name: "Roots", color: "#6B7F94", desc: "Sleep, food, shelter, safety, health" },
+  { id: "misfit", name: "Doesn't fit", color: "#E08A9A", desc: "Things that don't belong above" }
+];
 
-  const LY = [
-    { id: "fruits", name: "Fruits", color: "#8A7BAE", desc: "Purpose, growth, legacy" },
-    { id: "leaves", name: "Leaves", color: "#6E9AB8", desc: "Rest, play, output" },
-    { id: "branches", name: "Branches", color: "#3B8EA8", desc: "Connection, support, recognition, fun" },
-    { id: "trunk", name: "Trunk", color: "#4A82B3", desc: "Identity, boundaries, autonomy, time" },
-    { id: "roots", name: "Roots", color: "#6B7F94", desc: "Sleep, food, safety, routine, money" },
-    { id: "misfit", name: "Doesn't fit", color: "#E08A9A", desc: "Things that don't belong above" }
-  ];
+const DARK_NEEDS = [
+  { id: "control", title: "Control", desc: "The need to know what happens next.", shadow: "You micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
+  { id: "attention", title: "Attention", desc: "The need for someone to register you exist.", shadow: "You post provocatively or go silent hoping someone notices.", integrated: "Say it plainly: 'I need twenty minutes of your attention.'" },
+  { id: "anger", title: "Anger", desc: "The need to push back. Anger shows where your limits are.", shadow: "You snap at a dirty dishwasher or swallow it until you get headaches.", integrated: "Name it early: 'I'm getting annoyed. I need a minute.'" },
+  { id: "freedom", title: "Freedom from Responsibility", desc: "The need to put it down.", shadow: "You ignore bills for months or carry everything until you resent everyone.", integrated: "Pick the oldest thing you're avoiding and do five minutes of it." },
+  { id: "dependency", title: "Dependency", desc: "The need to rely on someone.", shadow: "You text 'are you mad at me?' after a short reply.", integrated: "Tell one person a real problem and say what you need." },
+  { id: "specialness", title: "Specialness", desc: "The need to feel like more than the crowd.", shadow: "You feel a sting when a friend succeeds.", integrated: "Choose one skill and practise it with no audience." }
+];
 
-  const P = [
-    { t: "Before the call", m: "prep", g: "Prepare safely and consistently", say: "No participant-facing script.", chk: "Participant code confirmed. Signed consent checked. Recording and photo permissions checked separately. Tree/Miro, cards, paper, pen ready.", iff: "If consent or permission is unclear, resolve before starting. No recording without explicit permission.", f: [["pcode", "Participant code (e.g. TN-014)"]] },
-    { t: "1. The Gate", m: "0–5 min", g: "Confirm voluntary participation and recording choice", say: "“This is a guided reflection, not therapy or diagnosis. You can skip any question, change your mind, or stop at any time. If anything feels too heavy, we pause. Are you still happy to take part? And are you comfortable with me recording? You can say no without explaining.”", iff: "If recording is declined: do not record. If participation is declined: stop.", f: [["consent", "Consent reconfirmed at session (Yes)"], ["rec", "Recording used? (Yes / No)"], ["pause", "Safety pause (leave blank until known)"]] },
-    { t: "2. The Baseline", m: "5–15 min", g: "Capture reference in her own words", say: "1. “Why do you want to do this today?” 2. “Before we start, what do you think your biggest need is right now?” 3. “If this session is useful, what would be different afterward, in one small, observable way?”", opt: "Optional, after all three: “Can you tell me about a recent time when this felt important?” then “What happened next?”", iff: "If “I don’t know”: accept it, mark Unclear, offer no options.", f: [["b1", "Baseline: Why today? (verbatim)"], ["b2", "Baseline: Biggest need (verbatim)"], ["b3", "Baseline: Useful outcome (verbatim)"]] },
-    { t: "3. Play / Soft Dive", m: "15–30 min", g: "Participant-led, lower intensity", say: "“Which of these cards (Connection, Play, Recognition, Rest) feel most present right now? Which feel missing?” After sorting: “We can stay here, or look at Roots and Trunk. You choose. There is no correct order.”", opt: "Before cards: “Thinking about the last few days, what has taken up most of your attention or energy?” After: “Does any card fit that, partly fit, or miss it?”", iff: "If Roots can’t be visited today: go to Anchor (8), then Return (10).", f: [["dive", "Soft Dive choice"], ["map", "Tree map / card placements"], ["expl", "Participant explanation"]] },
-    { t: "4. Build the Tree", m: "30–45 min", g: "Test whether the framework helps, without imposing hierarchy", say: "“The Tree is not a ladder. There is no balanced tree. Today’s tree only needs to be honest. You can disagree with the structure, place something in more than one area, or tell me it doesn’t fit anywhere.”", opt: "Before placing: “Can you describe a recent situation you would like to map?” After: “What does this structure help you see, if anything? What does it leave out or distort?”", iff: "If “This doesn’t fit”: “Why does this need belong here for you? Would it fit somewhere else?” Log Category Mismatch with exact quote.", f: [["fit", "Framework fit observed"], ["mis1", "Failure log: exact quote (category mismatch)"]] },
-    { t: "5. The Mirror", m: "45–55 min", g: "Explore a tension only if she raised both sides", say: "“I noticed X here, but earlier you mentioned Y. I’m not saying this is wrong. How do these live together in your life? Is it a problem to solve, a tension to hold, or something else?”", iff: "If she sees no tension: “Okay, thank you for clarifying.” Move on.", f: [["mirror", "Tension confirmed / rejected / clarified (her words)"]] },
-    { t: "6. Quiz / Emergencies", m: "55–65 min", g: "Test realism; seek disconfirming evidence", say: "“What’s destabilizing you right now? What would you call it?” “Do you agree with what the framework suggests is your priority? Is it realistic for your actual life?”", opt: "“Tell me about the most recent time you tried to make something easier. What did you do? What happened? What got in the way?”", iff: "If no: “What would need to be true for this to become realistic? What constraint is the framework not seeing?” If yes: “Where would this priority not work?”", f: [["emerg", "What she calls the destabilizer / emergency"], ["real", "Realism judged"], ["mis2", "Failure log: exact quote"], ["int2", "Researcher interpretation"]] },
-    { t: "7. Dark Needs / Flinch", m: "65–75 min", g: "Optional topic, explicit permission only", say: "“There is a harder section about needs that can look ugly from the outside. They are often protections. Do you want to go there?” If yes: “Where does this show up in your tree? What is it protecting? What does it cost you?”", iff: "If no: “That’s completely fine.” Stop. Don’t ask why.", f: [["dark", "Dark needs consented (Yes / No / Not offered / Unclear)"]] },
-    { t: "8. The Anchor", m: "75–85 min", g: "Her own definition of “enough”", say: "“What would ‘enough’ look like for you this season? Not perfect, not permanently fixed, but enough? How would you recognise that in everyday life?”", opt: "“Can you recall a recent moment that came close to your version of ‘enough’? What was happening?”", iff: "If unsure, allow uncertainty. Don’t supply an ideal.", f: [["enough", "Enough definition (verbatim)"]] },
-    { t: "9. The Certificate", m: "85–90 min", g: "Invite feedback on what failed, was missing, or was useful", say: "“Please note anything that did not fit, felt unhelpful, was missing, or could be improved. It’s also okay if nothing comes to mind.”", opt: "“Can you recall a point today when the Tree did not fit, was unhelpful, or left something out? What happened?”", iff: "Photograph only with separate permission. If nothing comes to mind, accept it.", f: [["fq1", "What felt wrong, missing, or unhelpful? (exact quote)"], ["fq2", "Which part forced a category that did not fit? (exact quote)"], ["fq3", "What would you warn a friend about? (exact quote)"]] },
-    { t: "10. The Return", m: "90–95 min", g: "Compare with baseline without implying causation", say: "“At the start, you said your biggest need was ____. What do you say now?” “If it changed, what changed in how you see it? If not, did the session confirm, deepen, or leave it untouched?” Close: “I will reach out in 3 months to see how your tree is growing. This is a practice, not a test. Any questions?”", iff: "A before/after difference does not prove causation.", f: [["fin", "Final: biggest need"], ["finu", "Final: useful outcome"], ["interp", "End-of-session interpretation"], ["fu", "Follow-up needed?"]] },
-    { t: "After the call", m: "within 30 min", g: "Document facilitator influence and data quality", say: "Ask yourself: Where did I lead her? What did I feel defensive about? What did I want her to say? What did I notice in her body language? Which questions did I rephrase or skip? What did I observe vs infer?", opt: "Record which optional probes were used, skipped, or adapted.", iff: "Missing data is not “No”. Mark incomplete honestly.", f: [["refl", "Facilitator reflexivity note"], ["comp", "Session data completeness"]] }
-  ];
+const PARENT_QUIZ = [
+  { layer: "roots", text: "I'm so focused on my child's needs that I've stopped meeting my own." },
+  { layer: "roots", text: "Our home or routine feels chaotic — I can't get a stable footing." },
+  { layer: "roots", text: "I'm exhausted in a way sleep doesn't fix." },
+  { layer: "trunk", text: "I've become 'mum' or 'dad' and lost the rest of who I am." },
+  { layer: "trunk", text: "I can't set a boundary with my child without feeling like a bad parent." },
+  { layer: "trunk", text: "I hide my own needs and feelings from my family." },
+  { layer: "branches", text: "I feel isolated — other parents don't seem to struggle the way I do." },
+  { layer: "branches", text: "I don't feel supported by my partner, my family, or my community." },
+  { layer: "branches", text: "I give endlessly and receive very little." },
+  { layer: "leaves", text: "I can't remember the last thing I did for myself." },
+  { layer: "leaves", text: "I feel like a machine that produces care." },
+  { layer: "leaves", text: "Rest feels impossible — there's always something." },
+  { layer: "fruits", text: "I'm so in the daily grind I've lost sight of the bigger picture." },
+  { layer: "fruits", text: "I don't feel like the parent I wanted to be." },
+  { layer: "fruits", text: "I can't connect to the meaning of this season." }
+];
 
-  let S = {};
-  try { S = JSON.parse(localStorage.getItem('ton') || '{}'); } catch(e) {}
-  if (!S.tree) S.tree = { fruits: [], leaves: [], branches: [], trunk: [], roots: [], misfit: [] };
-  if (!S.darkNeeds) S.darkNeeds = [];
+const P = [
+  { t: "Before the call", m: "prep", g: "Prepare safely and consistently", say: "No participant-facing script.", chk: "Participant code confirmed. Signed consent checked. Recording and photo permissions checked separately.", iff: "If consent or permission is unclear, resolve before starting.", f: [["pcode", "Participant code (e.g. TN-014)"]], optTrack: false },
+  { t: "1. The Gate", m: "0–5 min", g: "Confirm voluntary participation and recording choice", say: "“This is a guided reflection, not therapy or diagnosis. You can skip any question, change your mind, or stop at any time. If anything feels too heavy, we pause. Are you still happy to take part? And are you comfortable with me recording? You can say no without explaining.”", iff: "If recording is declined: do not record. If participation is declined: stop.", f: [["consent", "Consent reconfirmed at session", "select", ["", "Yes", "No", "Unclear"]], ["rec", "Recording used?", "select", ["", "Yes", "No", "Not offered", "Unclear"]], ["pause", "Safety pause", "select", ["", "No pause occurred", "Pause occurred", "Unclear"]]], optTrack: false },
+  { t: "2. The Baseline", m: "5–15 min", g: "Capture reference in her own words", say: "1. “Why do you want to do this today?” 2. “Before we start, what do you think your biggest need is right now?” 3. “If this session is useful, what would be different afterward, in one small, observable way?”", opt: "Optional probe, only after the three baseline answers: “Can you tell me about a recent time when this felt important?” If useful: “What happened next?”", iff: "If “I don’t know”: accept it, mark Unclear, offer no options.", f: [["b1", "Baseline: Why today? (verbatim)"], ["b2", "Baseline: Biggest need (verbatim)"], ["b3", "Baseline: Useful outcome (verbatim)"]], optTrack: true, optLabel: "Optional baseline probe used?" },
+  { t: "3. Play / Soft Dive", m: "15–30 min", g: "Participant-led, lower intensity", say: "“Which of these cards (Connection, Play, Recognition, Rest) feel most present right now? Which feel missing?” After sorting: “We can stay here, or look at Roots and Trunk. You choose. There is no correct order.”", opt: "Before cards: “Thinking about the last few days, what has taken up most of your attention or energy?” After: “Does any card fit that, partly fit, or miss it?”", iff: "If Roots can’t be visited today: go to Anchor (8), then Return (10).", f: [["dive", "Soft Dive choice"], ["map", "Tree map / card placements"], ["expl", "Participant explanation"]], optTrack: true, optLabel: "Optional soft-dive probe used?" },
+  { t: "4. Build the Tree", m: "30–45 min", g: "Test whether the framework helps, without imposing hierarchy", say: "“The Tree is not a ladder. There is no balanced tree. Today’s tree only needs to be honest. You can disagree with the structure, place something in more than one area, or tell me it doesn’t fit anywhere.”", opt: "Before placing: “Can you describe a recent situation you would like to map?” After: “What does this structure help you see, if anything? What does it leave out or distort?”", iff: "If “This doesn’t fit”: “Why does this need belong here for you? Would it fit somewhere else?” Log Category Mismatch with exact quote.", f: [["fit", "Framework fit observed", "select", ["", "Fit", "Partly fit", "Mismatch", "Not assessed"]], ["mis1", "Failure log: exact quote (category mismatch)"]], optTrack: true, optLabel: "Optional tree-mapping probe used?" },
+  { t: "5. The Quiz (parent)", m: "45–55 min", g: "Test framework fit using parent statements after the tree is built", say: "“Now that your tree is built, let's look at some statements. Tell me if they fit what you found, or miss it entirely.”", iff: "Accept 'misses it' as a valid answer.", f: [["quiz_reflect", "Quiz reflection notes"]], optTrack: true, optLabel: "Optional quiz probe used?" },
+  { t: "6. The Mirror", m: "55–65 min", g: "Explore a tension only if she raised both sides", say: "“I noticed X here, but earlier you mentioned Y. I’m not saying this is wrong. How do these live together in your life? Is it a problem to solve, a tension to hold, or something else?”", iff: "If she sees no tension: “Okay, thank you for clarifying.” Move on.", f: [["mirror", "Tension confirmed / rejected / clarified (her words)"]], optTrack: true, optLabel: "Optional mirror probe used?" },
+  { t: "7. Dark Needs / Flinch", m: "65–75 min", g: "Optional topic, explicit permission only", say: "“There is a harder section about needs that can look ugly from the outside. They are often protections. Do you want to go there?” If yes: “Where does this show up in your tree? What is it protecting? What does it cost you?”", iff: "If no: “That’s completely fine.” Stop. Don’t ask why. (The participant screen skips the Flinch unless this is set to Yes.)", f: [["dark", "Dark needs consented", "select", ["", "Yes", "No", "Not offered", "Unclear"]]], optTrack: true, optLabel: "Optional dark-needs probe used (only if consented)?" },
+  { t: "8. The Anchor", m: "75–85 min", g: "Her own definition of “enough”", say: "“What would ‘enough’ look like for you this season? Not perfect, not permanently fixed, but enough? How would you recognise that in everyday life?”", opt: "“Can you recall a recent moment that came close to your version of ‘enough’? What was happening?”", iff: "If unsure, allow uncertainty. Don’t supply an ideal.", f: [["enough", "Enough definition (verbatim)"], ["nextAction", "One observable action she will take + how she’ll know it helped"]], optTrack: true, optLabel: "Optional anchor probe used?" },
+  { t: "9. The Certificate", m: "85–90 min", g: "Invite feedback on what failed, was missing, or was useful", say: "“Please note anything that did not fit, felt unhelpful, was missing, or could be improved. It’s also okay if nothing comes to mind.”", opt: "“Can you recall a point today when the Tree did not fit, was unhelpful, or left something out? What happened?”", iff: "Photograph only with separate permission. If nothing comes to mind, accept it.", f: [["fq1", "What felt wrong, missing, or unhelpful? (exact quote)"], ["fq2", "Which part forced a category that did not fit? (exact quote)"], ["fq3", "What would you warn a friend about? (exact quote)"], ["photo_consent", "Photo permission (separate from recording)", "select", ["", "Yes", "No", "Not asked", "Unclear"]]], optTrack: true, optLabel: "Optional certificate feedback probe used?" },
+  { t: "10. The Return", m: "90–95 min", g: "Compare with baseline without implying causation", say: "“At the start, you said your biggest need was ____. What do you say now?” “If it changed, what changed in how you see it? If not, did the session confirm, deepen, or leave it untouched?” Close: “I will reach out in 3 months to see how your tree is growing. This is a practice, not a test. Any questions?”", iff: "A before/after difference does not prove causation.", f: [["fin", "Final: biggest need"], ["finu", "Final: useful outcome"], ["interp", "End-of-session interpretation", "select", ["", "Changed", "Confirmed", "Deepened", "Untouched", "Unclear"]], ["fu", "Follow-up needed?", "select", ["", "Yes", "No", "Unclear"]]], optTrack: true, optLabel: "Optional return probe used?" },
+  { t: "After the call", m: "within 30 min", g: "Document facilitator influence and data quality", say: "Ask yourself: Where did I lead her? What did I feel defensive about? What did I want her to say? What did I notice in her body language? Which questions did I rephrase or skip? What did I observe vs infer?", reflNote: "Parenting-specific: What did I notice in her body language when we talked about the kids?", iff: "Missing data is not “No”. Mark incomplete honestly.", f: [["refl", "Facilitator reflexivity note"], ["comp", "Session data completeness", "select", ["", "Complete", "Partly complete", "Not complete", "Not yet reviewed"]]], optTrack: false }
+];
 
-  const save = () => { try { localStorage.setItem('ton', JSON.stringify(S)); } catch(e) {} };
-  const esc = s => (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  const fld = ([k,l], ta=true) => `<label>${l}</label>${ta ? `<textarea data-k="${k}">${esc(S[k])}</textarea>` : `<input data-k="${k}" value="${esc(S[k])}">`}`;
+/* ============================================================
+   STATE & INIT
+   ============================================================ */
+const KEY_FACIL = 'ton.facilitator.v1';
+const KEY_PART = 'ton.participant.v1';
 
-  // Render Facilitator Flow
-  document.getElementById('flow').innerHTML = P.map((p,i) => `
-    <details>
-      <summary><span>${p.t}</span><small>${p.m}</small></summary>
-      <div class="b">
-        <p><b>${p.g}</b></p>
-        <div class="say">${p.say}</div>
-        ${p.opt ? `<div class="opt">${p.opt}</div>` : ''}
-        ${p.chk ? `<p class="opt">${p.chk}</p>` : ''}
-        <p class="if">${p.iff}</p>
-        ${p.f.map(x => fld(x, i>0)).join('')}
-        <label class="done"><input type="checkbox" data-k="done${i}" ${S['done'+i]?'checked':''}> Phase done</label>
-      </div>
-    </details>
-  `).join('') + '<p class="sub">Prompts are abridged. The protocol spreadsheet remains the source of exact wording.</p>';
+let S = {}; // Facilitator State
+let PS = {}; // Participant State
 
-  // --- PARTICIPANT LOGIC ---
-  let currentSheetLayer = null;
+// Load Facilitator
+try { const r = JSON.parse(localStorage.getItem(KEY_FACIL) || '{}'); if(r && typeof r === 'object') S = r; } catch(e) {}
+if (!S.tree) S.tree = { fruits: [], leaves: [], branches: [], trunk: [], roots: [], misfit: [] };
+if (!S.darkNeeds) S.darkNeeds = [];
 
-  function renderMumTree() {
-    const container = document.getElementById('mum-tree-container');
-    container.innerHTML = '';
-    
-    LY.slice(0, 5).forEach(layer => {
-      const div = document.createElement('div');
-      div.className = 'tree-layer';
-      div.style.setProperty('--layer-color', layer.color);
-      div.onclick = () => openSheet(layer.id);
-      
-      const chipsHtml = S.tree[layer.id].map(need => {
-        const isCustom = !NEEDS_LIBRARY[layer.id].includes(need) && !NEEDS_LIBRARY.misfit.includes(need);
-        return `<span class="chip on ${isCustom ? 'custom' : ''}">${need}</span>`;
-      }).join('');
+// Load Participant
+try { const r = JSON.parse(localStorage.getItem(KEY_PART) || '{}'); if(r && typeof r === 'object') PS = r; } catch(e) {}
+if (!PS.tree) PS.tree = { fruits: [], leaves: [], branches: [], trunk: [], roots: [], misfit: [] };
+if (!PS.darkNeeds) PS.darkNeeds = [];
+if (!PS.softDive) PS.softDive = {};
+if (!PS.quiz) PS.quiz = Array(15).fill(null);
+if (!PS.ownWords) PS.ownWords = "";
+if (!PS.enough) PS.enough = "";
+if (!PS.quizFocus) PS.quizFocus = null;
 
-      div.innerHTML = `
-        <h3>${layer.name}</h3>
-        <div class="desc">${layer.desc}</div>
-        <div class="chips">${chipsHtml || '<span style="font-size:0.85rem;color:var(--mute);font-style:italic;">Tap to add...</span>'}</div>
-      `;
-      container.appendChild(div);
-    });
+const saveFacil = () => { try { localStorage.setItem(KEY_FACIL, JSON.stringify(S)); } catch(e) {} };
+const savePart = () => { try { localStorage.setItem(KEY_PART, JSON.stringify(PS)); } catch(e) {} };
 
-    const misfitChips = S.tree.misfit.map(need => `<span class="chip on custom">${need}</span>`).join('');
-    document.getElementById('misfit-chips').innerHTML = misfitChips;
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ============================================================
+   FACILITATOR TAB RENDERING
+   ============================================================ */
+const fld = (d, ta) => {
+  const [key, label, type, options] = d;
+  if(type === 'select') {
+    return `<label>${esc(label)}</label><select data-k="${esc(key)}">${options.map(o => `<option value="${esc(o)}" ${S[key] === o ? 'selected' : ''}>${esc(o) || '— choose —'}</option>`).join('')}</select>`;
   }
+  return `<label>${esc(label)}</label>${ta ? `<textarea data-k="${esc(key)}">${esc(S[key])}</textarea>` : `<input type="text" data-k="${esc(key)}" value="${esc(S[key])}">`}`;
+};
 
-  function openSheet(layerId) {
-    currentSheetLayer = layerId;
-    const layer = LY.find(l => l.id === layerId);
-    document.getElementById('sheet-title').innerText = layer.name;
-    document.getElementById('sheet-title').style.color = layer.color;
-    document.getElementById('sheet-search').value = '';
-    renderSheetNeeds('');
-    document.getElementById('sheet').classList.add('show');
-  }
+document.getElementById('flow').innerHTML = P.map((p, i) => `
+  <details>
+    <summary><span>${esc(p.t)}</span><small>${esc(p.m)}</small></summary>
+    <div class="b">
+      <p><b>${esc(p.g)}</b></p>
+      <div class="say">${esc(p.say)}</div>
+      ${p.opt ? `<div class="opt">${esc(p.opt)}</div>` : ''}
+      ${p.chk ? `<p class="opt">${esc(p.chk)}</p>` : ''}
+      ${p.reflNote ? `<div class="refl-note"><div class="refl-label">Reflexivity question</div>${esc(p.reflNote)}</div>` : ''}
+      <p class="if">${esc(p.iff)}</p>
+      ${p.optTrack ? `<div class="opt-track">
+        <label>${esc(p.optLabel)}</label>
+        <select data-k="opt_used_${i}">${['','Used','Skipped','Adapted','Not applicable'].map(o => `<option value="${o}" ${S['opt_used_'+i] === o ? 'selected' : ''}>${o || '— choose —'}</option>`).join('')}</select>
+        <label>If used or adapted, why? (optional)</label>
+        <input type="text" data-k="opt_why_${i}" value="${esc(S['opt_why_'+i])}" placeholder="e.g. clarified a concrete episode">
+      </div>` : ''}
+      ${p.f.map(x => fld(x, i > 0)).join('')}
+      <label class="done"><input type="checkbox" data-k="done${i}" ${S['done'+i] ? 'checked' : ''}> Phase done</label>
+    </div>
+  </details>
+`).join('') + '<p class="sub">Prompts are abridged. The protocol spreadsheet remains the source of exact wording.</p>';
 
-  function closeSheet(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('sheet').classList.remove('show');
-    renderMumTree();
-    save();
-  }
+/* ============================================================
+   PARTICIPANT TAB LOGIC (Guided Flow)
+   ============================================================ */
+let currentPStage = 1;
+let currentSheetLayer = null;
 
-  function renderSheetNeeds(filterText) {
-    const container = document.getElementById('sheet-needs-container');
-    container.innerHTML = '';
-    let needsToShow = [];
-    
-    if (filterText) {
-      Object.keys(NEEDS_LIBRARY).forEach(layer => {
-        NEEDS_LIBRARY[layer].forEach(need => {
-          if (need.toLowerCase().includes(filterText.toLowerCase()) && !needsToShow.includes(need)) needsToShow.push(need);
-        });
-      });
-    } else {
-      needsToShow = NEEDS_LIBRARY[currentSheetLayer] || [];
+function pNav(stage) {
+  if (stage === 2 && !PS.ownWords.trim()) return; // Hard gate
+  
+  // Hide all
+  for(let i=1; i<=8; i++) document.getElementById('p-stage-'+i).classList.add('hide');
+  
+  // Show target
+  document.getElementById('p-stage-'+stage).classList.remove('hide');
+  currentPStage = stage;
+  
+  // Stage-specific init
+  if (stage === 3) renderSoftDive();
+  if (stage === 4) renderTreeDropZones();
+  if (stage === 5) renderQuiz();
+  if (stage === 6) {
+    // Protocol gate: skip flinch if not consented by facilitator
+    if (S.dark !== 'Yes') {
+      pNav(7);
+      return;
     }
-
-    needsToShow.forEach(need => {
-      const isOn = S.tree[currentSheetLayer].includes(need);
-      const btn = document.createElement('button');
-      btn.className = `need-opt ${isOn ? 'on' : ''}`;
-      btn.innerText = need;
-      btn.onclick = () => toggleNeed(currentSheetLayer, need);
-      container.appendChild(btn);
-    });
-
-    if (needsToShow.length === 0 && filterText) {
-      container.innerHTML = `<p style="color:var(--mute);font-size:0.9rem;">No needs found. Press Enter to add "${filterText}".</p>`;
-    }
+    renderFlinch();
   }
-
-  function toggleNeed(layerId, need) {
-    const arr = S.tree[layerId];
-    const idx = arr.indexOf(need);
-    if (idx > -1) arr.splice(idx, 1);
-    else arr.push(need);
-    save();
-    renderSheetNeeds(document.getElementById('sheet-search').value);
-    renderMumTree();
-  }
-
-  function filterNeeds() {
-    renderSheetNeeds(document.getElementById('sheet-search').value);
-  }
-
-  function addCustomNeed(e) {
-    if (e.key === 'Enter' && e.target.value.trim() !== '') {
-      const val = e.target.value.trim();
-      if (!S.tree[currentSheetLayer].includes(val)) S.tree[currentSheetLayer].push(val);
-      e.target.value = '';
-      filterNeeds();
-      renderMumTree();
-      save();
-    }
-  }
-
-  function showDarkNeeds() {
-    document.getElementById('mum-tree').classList.add('hide');
-    document.getElementById('mum-dark').classList.remove('hide');
-    const container = document.getElementById('dark-needs-list');
-    container.innerHTML = '';
-    
-    DARK_NEEDS.forEach(dn => {
-      const div = document.createElement('div');
-      div.className = 'fb';
-      const isSel = S.darkNeeds.find(d => d.id === dn.id);
-      div.innerHTML = `
-        <h3>${dn.title}</h3>
-        <p style="font-size:0.85rem;color:var(--mute);margin-bottom:8px">${dn.desc}</p>
-        ${isSel ? `
-          <p style="color:var(--warn);font-size:0.85rem;margin-bottom:4px"><strong>Shadow:</strong> ${dn.shadow}</p>
-          <p style="color:var(--cy);font-size:0.85rem"><strong>Integrated:</strong> ${dn.integrated}</p>
-        ` : `<button class="btn" onclick="toggleDarkNeed('${dn.id}')">This is me</button>`}
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function toggleDarkNeed(id) {
-    if (S.darkNeeds.length >= 2) { alert("Please select only the 2 that resonate most."); return; }
-    S.darkNeeds.push({ id: id });
-    save();
-    showDarkNeeds();
-  }
-
-  function finishParticipant() {
-    document.getElementById('mum-dark').classList.add('hide');
-    document.getElementById('mum-cert').classList.remove('hide');
+  if (stage === 8) {
     document.getElementById('cert-preview').innerHTML = buildCertHTML();
   }
+  
+  window.scrollTo(0, 0);
+}
 
-  // --- CERTIFICATE BUILDING ---
-  function buildCertHTML() {
-    const code = esc(S.pcode || 'TN-___');
-    return `
-      <div class="cert">
-        <h2>The Tree of Needs</h2><p class="q">“This is a practice, not a test.”</p>
-        ${LY.map((l,i) => `<div class="ly" style="--c:${l.color}"><b>${l.name}</b><div>${S.tree[l.id] && S.tree[l.id].length ? esc(S.tree[l.id].join(', ')) : `<span class="e">${l.desc}</span>`}</div></div>`).join('')}
-        <div class="anchor"><small>What "enough" looks like</small>${S.enough ? '“' + esc(S.enough) + '”' : '<span class="e">—</span>'}</div>
-        <h2 style="color:var(--warn);font-size:1.3rem;margin-top:26px">The Falsification Log</h2><p class="q">“Where did this framework fail you today?”</p>
-        ${[["What felt wrong, missing, or unhelpful?","fq1"],["Which part forced a category that did not fit?","fq2"],["What would you warn a friend about?","fq3"]].map(a => `<div class="fb"><h3>${a[0]}</h3>${S[a[1]] ? '<b>Exact quote:</b> “' + esc(S[a[1]]) + '”' : '<span class="e">Nothing came to mind (that is valid data).</span>'}</div>`).join('')}
-        <p class="ft">A reflection tool, not therapy or diagnosis.<br>Participant ID: ${code} · ${new Date().toLocaleDateString()}</p>
-      </div>
-    `;
+function showLayerInfo(layerId) {
+  const layer = LY.find(l => l.id === layerId);
+  if(!layer) return;
+  
+  // Use the bottom sheet to show info
+  document.getElementById('sheet-title').innerText = layer.name;
+  document.getElementById('sheet-title').style.color = layer.color;
+  document.getElementById('sheet-search').style.display = 'none';
+  
+  const container = document.getElementById('sheet-needs-container');
+  container.innerHTML = `<p style="font-size:1.05rem;line-height:1.6;width:100%">${esc(layer.desc)}. This layer holds the needs that relate to this part of your life.</p>`;
+  
+  document.getElementById('sheet').classList.add('show');
+}
+
+function closeSheet(e) {
+  if(e) e.stopPropagation();
+  document.getElementById('sheet').classList.remove('show');
+  document.getElementById('sheet-search').style.display = 'block'; // reset for add need
+}
+
+/* Stage 2: Own Words Listener */
+document.getElementById('ownWordsInput').addEventListener('input', function(e) {
+  PS.ownWords = e.target.value;
+  savePart();
+  document.getElementById('btnStage2Next').disabled = !PS.ownWords.trim();
+});
+
+/* Stage 3: Soft Dive */
+const SOFT_DIVE_CARDS = [
+  { id: 'connection', label: 'Connection', layer: 'branches' },
+  { id: 'play', label: 'Play', layer: 'leaves' },
+  { id: 'recognition', label: 'Recognition', layer: 'branches' },
+  { id: 'rest', label: 'Rest and sleep', layer: 'roots' }
+];
+
+function renderSoftDive() {
+  const grid = document.getElementById('softDiveGrid');
+  grid.innerHTML = SOFT_DIVE_CARDS.map(c => {
+    const state = PS.softDive[c.id] || null;
+    return `<div class="chip ${state ? 'on '+state : ''}" onclick="cycleSoftDive('${c.id}')">${esc(c.label)}</div>`;
+  }).join('');
+}
+
+function cycleSoftDive(id) {
+  const current = PS.softDive[id];
+  if (!current) PS.softDive[id] = 'present';
+  else if (current === 'present') PS.softDive[id] = 'missing';
+  else delete PS.softDive[id];
+  
+  savePart();
+  renderSoftDive();
+}
+
+/* Stage 4: Build the Tree */
+function renderTreeDropZones() {
+  const container = document.getElementById('treeDropZones');
+  container.innerHTML = LY.map(l => {
+    const chips = PS.tree[l.id].map(n => `<span class="chip on" style="background:${l.color};border-color:${l.color};color:#fff">${esc(n)}</span>`).join('');
+    return `<div class="drop-layer" style="--layer-color:${l.color}" ondragover="allowDrop(event)" ondrop="dropNeed(event, '${l.id}')">
+      <h4>${esc(l.name)} <span>+ Add</span></h4>
+      <div class="chips">${chips || '<span style="color:var(--mute);font-size:0.85rem;font-style:italic">Tap + Add to place needs here.</span>'}</div>
+      <button class="btn" style="margin-top:8px;font-size:0.8rem;padding:4px 10px" onclick="openAddSheet('${l.id}')">+ Add to ${esc(l.name)}</button>
+    </div>`;
+  }).join('');
+}
+
+function openAddSheet(layerId) {
+  currentSheetLayer = layerId;
+  const layer = LY.find(l => l.id === layerId);
+  document.getElementById('sheet-title').innerText = layer.name;
+  document.getElementById('sheet-title').style.color = layer.color;
+  document.getElementById('sheet-search').value = '';
+  document.getElementById('sheet-search').style.display = 'block';
+  renderSheetNeeds('');
+  document.getElementById('sheet').classList.add('show');
+}
+
+function renderSheetNeeds(filterText) {
+  const container = document.getElementById('sheet-needs-container');
+  container.innerHTML = '';
+  if(!currentSheetLayer) return;
+  
+  let list = [];
+  if (filterText) {
+    const all = Object.values(NEEDS_LIBRARY).flat();
+    list = [...new Set(all)].filter(n => n.toLowerCase().includes(filterText.toLowerCase()));
+  } else {
+    list = NEEDS_LIBRARY[currentSheetLayer] || [];
   }
 
-  // --- UI LOGIC ---
-  document.addEventListener('input', e => {
-    const k = e.target.dataset.k;
-    if (!k) return;
-    S[k] = e.target.type == 'checkbox' ? e.target.checked : e.target.value;
-    save();
+  list.forEach(need => {
+    const isOn = PS.tree[currentSheetLayer].includes(need);
+    const btn = document.createElement('button');
+    btn.className = `chip ${isOn ? 'on' : ''}`;
+    btn.textContent = need;
+    btn.onclick = () => toggleNeed(currentSheetLayer, need);
+    container.appendChild(btn);
   });
-
-  function sw(n) {
-    document.getElementById('flow').classList.toggle('hide', n !== 1);
-    document.getElementById('participant').classList.toggle('hide', n !== 2);
-    document.getElementById('certs').classList.toggle('hide', n !== 3);
-    document.getElementById('t1').classList.toggle('on', n === 1);
-    document.getElementById('t2').classList.toggle('on', n === 2);
-    document.getElementById('t3').classList.toggle('on', n === 3);
-    if (n === 2) renderMumTree();
-    if (n === 3) document.getElementById('out').innerHTML = buildCertHTML();
+  
+  if(list.length === 0 && filterText) {
+    container.innerHTML = `<p style="color:var(--mute);font-size:0.9rem;width:100%">Press Enter to add "${esc(filterText)}"</p>`;
   }
+}
 
-  // Init
-  renderMumTree();
+function toggleNeed(layerId, need) {
+  const arr = PS.tree[layerId];
+  const idx = arr.indexOf(need);
+  if (idx > -1) arr.splice(idx, 1);
+  else arr.push(need);
+  savePart();
+  renderSheetNeeds(document.getElementById('sheet-search').value);
+  if(document.getElementById('sheet-search').style.display === 'none') {
+    closeSheet(); // Close info sheet
+  } else {
+    renderTreeDropZones(); // Update main view behind sheet
+  }
+}
+
+function filterNeeds() {
+  renderSheetNeeds(document.getElementById('sheet-search').value);
+}
+
+function addCustomNeed(e) {
+  if (e.key === 'Enter' && e.target.value.trim() !== '' && currentSheetLayer) {
+    const val = e.target.value.trim();
+    if (!PS.tree[currentSheetLayer].includes(val)) PS.tree[currentSheetLayer].push(val);
+    e.target.value = '';
+    savePart();
+    filterNeeds();
+    renderTreeDropZones();
+  }
+}
+
+/* Stage 5: Parent Quiz */
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = PARENT_QUIZ.map((q, i) => {
+    const val = PS.quiz[i];
+    return `<div class="quiz-q">
+      <p>${esc(q.text)}</p>
+      <div class="scale">
+        ${[0,1,2,3,4].map(v => `<button class="${val === v ? 'on' : ''}" onclick="setQuizAns(${i}, ${v})">${v}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  
+  const allAnswered = PS.quiz.every(v => v !== null);
+  document.getElementById('btnQuizNext').disabled = !allAnswered;
+}
+
+function setQuizAns(idx, val) {
+  PS.quiz[idx] = val;
+  savePart();
+  renderQuiz();
+}
+
+function showQuizResult() {
+  document.getElementById('quizContainer').classList.add('hide');
+  document.getElementById('quizNav').classList.add('hide');
+  document.getElementById('quizResult').classList.remove('hide');
+  
+  // Calculate scores
+  const scores = { roots: 0, trunk: 0, branches: 0, leaves: 0, fruits: 0 };
+  PARENT_QUIZ.forEach((q, i) => { scores[q.layer] += PS.quiz[i]; });
+  
+  const maxScore = 12; // 3 questions * 4 max
+  const scoreContainer = document.getElementById('quizScores');
+  scoreContainer.innerHTML = LY.slice(0, 5).map(l => {
+    const s = scores[l.id] || 0;
+    const pct = (s / maxScore) * 100;
+    return `<div class="quiz-score-row">
+      <b style="color:${l.color}">${esc(l.name)}</b>
+      <div class="bar"><div style="width:${pct}%;background:${l.color}"></div></div>
+      <span>${s}/12</span>
+    </div>`;
+  }).join('');
+}
+
+function resetQuiz() {
+  document.getElementById('quizResult').classList.add('hide');
+  document.getElementById('quizContainer').classList.remove('hide');
+  document.getElementById('quizNav').classList.remove('hide');
+  renderQuiz();
+}
+
+/* Stage 6: Flinch */
+function renderFlinch() {
+  const container = document.getElementById('flinchContainer');
+  container.innerHTML = DARK_NEEDS.map(dn => {
+    const isSel = PS.darkNeeds.some(d => d.id === dn.id);
+    return `<div class="flinch-card">
+      <h3>${esc(dn.title)}</h3>
+      <p>${esc(dn.desc)}</p>
+      ${isSel ? `
+        <div class="shadow"><strong>Shadow:</strong> ${esc(dn.shadow)}</div>
+        <div class="integrated"><strong>Integrated:</strong> ${esc(dn.integrated)}</div>
+        <button class="btn" style="margin-top:10px;font-size:0.8rem;border-color:var(--warn);color:var(--warn)" onclick="toggleDarkNeed('${dn.id}')">Remove</button>
+      ` : `
+        <button class="btn" onclick="toggleDarkNeed('${dn.id}')">This is me</button>
+      `}
+    </div>`;
+  }).join('');
+}
+
+function toggleDarkNeed(id) {
+  const i = PS.darkNeeds.findIndex(d => d.id === id);
+  if (i >= 0) PS.darkNeeds.splice(i, 1);
+  else {
+    if (PS.darkNeeds.length >= 2) { alert("Please select only the 2 that resonate most."); return; }
+    PS.darkNeeds.push({ id });
+  }
+  savePart();
+  renderFlinch();
+}
+
+/* Stage 7: Anchor */
+document.querySelector('[data-k="enough"]').addEventListener('input', function(e) {
+  PS.enough = e.target.value;
+  savePart();
+});
+
+/* Certificate */
+function buildCertHTML() {
+  const code = esc(S.pcode || 'TN-___');
+  const ownWords = PS.ownWords.trim() ? `<div class="anchor-display"><small>In your own words</small>“${esc(PS.ownWords)}”</div>` : '';
+  const darkList = PS.darkNeeds.length ? `<div class="kv" style="margin-bottom:10px"><b>Flinch chosen</b>${PS.darkNeeds.map(d => DARK_NEEDS.find(n => n.id === d.id).title).join(', ')}</div>` : '';
+  const quizFocus = PS.quizFocus ? `<div class="kv" style="margin-bottom:10px"><b>Focus from Quiz</b>${esc(PS.quizFocus)}</div>` : '';
+  
+  return `<div class="cert">
+    <h2>The Tree of Needs</h2><p class="q">“This is a practice, not a test.”</p>
+    ${ownWords}
+    ${LY.map(l => `<div class="ly" style="--c:${l.color}"><b>${esc(l.name)}</b><div>${PS.tree[l.id].length ? esc(PS.tree[l.id].join(', ')) : `<span class="e">${esc(l.desc)}</span>`}</div></div>`).join('')}
+    <div class="anchor-display"><small>What "enough" looks like</small>${PS.enough ? '“' + esc(PS.enough) + '”' : '<span class="e">—</span>'}</div>
+    ${darkList}${quizFocus}
+    <h2 style="color:var(--warn);font-size:1.3rem;margin-top:26px">The Falsification Log</h2><p class="q">“Where did this framework fail you today?”</p>
+    ${[["What felt wrong, missing, or unhelpful?","fq1"],["Which part forced a category that did not fit?","fq2"],["What would you warn a friend about?","fq3"]].map(a => `<div class="fb"><h3>${esc(a[0])}</h3><span class="e">Participant to fill in facilitator tab.</span></div>`).join('')}
+    <p class="ft">A reflection tool, not therapy or diagnosis.<br>Participant ID: ${code} · ${new Date().toLocaleDateString()}</p>
+  </div>`;
+}
+
+/* ============================================================
+   TAB SWITCHING & GLOBAL LISTENERS
+   ============================================================ */
+function sw(n) {
+  ['flow','participant','certs'].forEach((id, i) => document.getElementById(id).classList.toggle('hide', n !== i+1));
+  [1,2,3].forEach(i => document.getElementById('t'+i).classList.toggle('on', n === i));
+  
+  if (n === 2) {
+    // Reset to stage 1 on tab open
+    pNav(1); 
+    document.getElementById('btnStage2Next').disabled = !PS.ownWords.trim();
+    document.getElementById('ownWordsInput').value = PS.ownWords;
+    document.querySelector('[data-k="enough"]').value = PS.enough;
+  }
+  if (n === 3) {
+    document.getElementById('out').innerHTML = buildCertHTML();
+  }
+}
+
+// Facilitator field saves
+document.addEventListener('input', e => {
+  const k = e.target.dataset.k;
+  if (!k) return;
+  S[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  saveFacil();
+});
+document.addEventListener('change', e => {
+  const k = e.target.dataset.k;
+  if (!k) return;
+  S[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  saveFacil();
+});
+
+// Init
+renderSoftDive();
+renderTreeDropZones();
+renderQuiz();
+renderFlinch();
+
 </script>
 </body>
 </html>
