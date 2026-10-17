@@ -3,276 +3,263 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Needs Tree — Your map of what sustains you</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Tree of Needs — Session App</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  /* The new beautiful dark theme based on your images */
-  color-scheme: dark;
-  --bg:#0A0E14; --bg-light:#121B24; --ink:#E6EEF5; --mute:#7A8D9C; 
-  --card:#121B24; --line:#1F2C3A; --moss:#00E5FF; --hot:#E08A9A; --gold:#F2A65A;
-  --c-roots:#6B7F94; --c-trunk:#4A82B3; --c-branches:#3B8EA8; --c-leaves:#6E9AB8; --c-fruits:#8A7BAE;
-  --c-healthy:#5B8FB9; --c-moderate:#C68B4A; --c-strained:#B85C6B;
-  --radius:14px;--radius-sm:10px;--radius-xs:8px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.2);
-  --shadow-md:0 4px 16px rgba(0,0,0,.3);
-  --shadow-lg:0 12px 40px rgba(0,0,0,.5);
-  --transition:220ms cubic-bezier(0.16,1,0.3,1);
-  --font-display:'Fraunces',Georgia,serif;
-  --font-body:'Public Sans',system-ui,sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-body{min-height:100dvh;line-height:1.6;font-family:var(--font-body);font-size:16px;color:var(--ink);background:var(--bg);background-image:radial-gradient(circle at 50% 0%, rgba(242,166,90,0.05) 0%, transparent 50%)}
-button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
-h1,h2,h3,h4{line-height:1.2;font-family:var(--font-display)}
-p{max-width:72ch}
-:focus-visible{outline:2px solid var(--moss);outline-offset:3px;border-radius:var(--radius-xs)}
+  :root {
+    --bg: #0A0E14; --bg-light: #121B24; --ink: #E6EEF5; --mute: #7A8D9C; 
+    --gold: #F2A65A; --gold-light: #FFCF96; --cyan: #00E5FF; --warn: #E08A9A;
+    --line: #1F2C3A; --radius: 24px; --radius-sm: 12px;
+    --font-display: 'Fraunces', Georgia, serif; --font-body: 'Public Sans', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 16px/1.6 var(--font-body); background: var(--bg); color: var(--ink); padding-bottom: 40px; background-image: radial-gradient(circle at 50% 0%, rgba(242,166,90,0.05) 0%, transparent 50%); }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; font-weight: 600; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .app-container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+  
+  /* Shared UI */
+  .btn { display: inline-block; padding: 14px 24px; border-radius: 40px; background: linear-gradient(135deg, var(--gold) 0%, #D4843A 100%); color: #0A0E14; font-weight: 600; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(242,166,90,0.2); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.o { background: transparent; border: 1px solid var(--mute); color: var(--ink); box-shadow: none; }
+  .btn.o:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn.small { padding: 8px 16px; font-size: 0.85rem; }
+  .card { background: var(--bg-light); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+  
+  /* Navigation */
+  .nav-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+  .nav-tab { padding: 10px 20px; border-radius: 30px; border: 1px solid var(--line); font-weight: 600; font-size: 0.9rem; color: var(--mute); transition: all 0.2s; }
+  .nav-tab.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
 
-/* Layout */
-.app{display:flex;min-height:100dvh}
-.sidebar{width:260px;flex-shrink:0;background:var(--bg-light);border-right:1px solid var(--line);padding:24px 0;position:fixed;top:0;bottom:0;left:0;z-index:100;display:flex;flex-direction:column;transition:transform var(--transition)}
-.sidebar-brand{padding:0 24px 24px;display:flex;align-items:center;gap:10px;color:var(--gold)}
-.sidebar-brand .logo{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.sidebar-brand span{font-family:var(--font-display);font-weight:700;font-size:1.2rem;letter-spacing:0.02em}
-.nav{flex:1;padding:0 12px;overflow-y:auto}
-.nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);font-size:.92rem;font-weight:500;color:var(--mute);transition:all var(--transition);cursor:pointer;width:100%;text-align:left}
-.nav-item:hover{background:var(--bg);color:var(--ink)}
-.nav-item.active{background:rgba(0,229,255,0.1);color:var(--moss)}
-.nav-icon{width:20px;height:20px;opacity:.6;flex-shrink:0}
-.nav-item.active .nav-icon{opacity:1}
-.sidebar-footer{padding:16px 24px;font-size:.78rem;color:var(--mute);border-top:1px solid var(--line)}
-.main{flex:1;margin-left:260px;padding:32px 40px 80px;max-width:100%}
-@media(max-width:900px){
-  .sidebar{transform:translateX(-100%);box-shadow:var(--shadow-lg)}
-  .sidebar.open{transform:translateX(0)}
-  .main{margin-left:0;padding:20px 16px 60px}
-}
+  /* Facilitator Split View */
+  .layout-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 768px) { .layout-split { grid-template-columns: 1fr; } }
 
-/* Pages */
-.page{display:none}
-.page.active{display:block;animation:fadeIn 0.4s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  /* Participant Tree UI */
+  #participant-view { display: none; max-width: 600px; margin: 0 auto; }
+  .tree-layer { background: var(--bg-light); border: 2px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s; }
+  .tree-layer:hover { border-color: var(--layer-color); transform: translateY(-2px); }
+  .tree-layer h3 { font-size: 1.3rem; margin-bottom: 4px; color: var(--layer-color); }
+  .tree-layer .layer-desc { font-size: 0.9rem; color: var(--mute); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip { padding: 6px 12px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); font-size: 0.85rem; }
+  .chip.on { background: var(--cyan); color: #000; border-color: var(--cyan); }
+  .chip.custom { border-color: var(--gold); color: var(--gold); }
 
-/* UI Elements */
-.onboarding{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;max-width:520px;margin:0 auto}
-.onboarding h1{font-size:2.5rem;margin-bottom:16px;color:var(--gold)}
-.onboarding p{font-size:1.08rem;color:var(--mute);margin-bottom:24px;line-height:1.7;max-width:46ch;margin-left:auto;margin-right:auto}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:40px;font-size:.92rem;font-weight:600;transition:all var(--transition);min-height:44px;border:1.5px solid transparent;text-decoration:none}
-.btn-primary{background:linear-gradient(135deg, var(--gold) 0%, #D4843A 100%);color:#0A0E14;box-shadow:0 4px 15px rgba(242,166,90,0.2)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(242,166,90,0.4)}
-.btn-outline{border-color:var(--line);color:var(--ink)}
-.btn-outline:hover{border-color:var(--moss);color:var(--moss)}
-.btn-ghost{color:var(--mute)}
-.btn-ghost:hover{color:var(--ink)}
-.btn-small{padding:8px 14px;font-size:.82rem;min-height:36px}
-.btn:disabled{opacity:.4;pointer-events:none}
-.action-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.action-row.left{justify-content:flex-start}
+  /* Bottom Sheet for Needs */
+  .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
+  .sheet-overlay.show { display: flex; }
+  .sheet-content { background: var(--bg-light); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 85vh; overflow-y: auto; border-top: 1px solid var(--line); }
+  .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .sheet-header h2 { color: var(--layer-color); }
+  .search-input { width: 100%; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(0,0,0,0.2); color: var(--ink); font: inherit; margin-bottom: 16px; }
+  .need-option { display: inline-block; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--line); background: rgba(0,0,0,0.2); margin: 4px; font-size: 0.9rem; transition: all 0.2s; }
+  .need-option:hover { border-color: var(--cyan); }
+  .need-option.on { background: var(--cyan); color: #000; border-color: var(--cyan); }
 
-/* Cards & Typography */
-.card{background:var(--bg-light);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:inset 0 0 40px rgba(0,0,0,0.1)}
-.hl{border-color:var(--gold);box-shadow:0 0 30px rgba(242,166,90,0.1)}
-.k{font-size:.75rem;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
-.m{color:var(--mute)}.s{font-size:.85rem}
-.quote{border-left:3px solid var(--moss);padding:8px 0 8px 16px;margin-bottom:16px;font-style:italic;color:var(--gold);font-family:var(--font-display);font-size:1.1rem}
+  /* Dark Needs Cards */
+  .dark-need-card { background: #000; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+  .dark-need-card h3 { color: var(--gold-light); }
+  .dark-need-card p { font-size: 0.9rem; color: var(--mute); margin-bottom: 12px; }
+  .dark-need-card .shadow { color: var(--warn); font-size: 0.9rem; margin-bottom: 12px; }
+  .dark-need-card .integrated { color: var(--cyan); font-size: 0.9rem; margin-bottom: 12px; }
 
-/* Inputs */
-textarea,input[type=text]{width:100%;padding:16px;border:1px solid var(--line);border-radius:var(--radius-sm);background:rgba(0,0,0,0.2);color:var(--ink);font:inherit;margin-bottom:12px;transition:border-color var(--transition)}
-textarea:focus,input[type=text]:focus{outline:none;border-color:var(--moss)}
-textarea{min-height:100px;resize:vertical}
+  /* Facilitator Data Entry */
+  .protocol-panel { background: var(--bg-light); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+  .script-box { background: rgba(0,229,255,0.05); border-left: 3px solid var(--cyan); padding: 16px; margin-bottom: 16px; font-style: italic; font-size: 0.95rem; }
+  .data-entry label { display: block; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--mute); margin-bottom: 6px; margin-top: 12px; }
+  .data-entry input, .data-entry textarea, .data-entry select { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: rgba(0,0,0,0.2); color: var(--ink); margin-bottom: 8px; }
 
-/* Tree Interface */
-.tree-layer-block {background:var(--bg-light);border:2px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;transition:all 0.3s ease}
-.tree-layer-block h3 {font-size:1.4rem;margin-bottom:4px;color:var(--layer-color)}
-.tree-layer-block .layer-desc {font-size:0.9rem;color:var(--mute);margin-bottom:16px}
-.tree-layer-block textarea {width:100%;min-height:80px;padding:16px;border:1px solid var(--line);border-radius:var(--radius-sm);background:rgba(0,0,0,0.2);color:var(--ink);font:inherit;resize:vertical}
-.tree-layer-block textarea:focus {outline:none;border-color:var(--moss)}
-
-/* Dark Needs Deck */
-.dark-need-card{background:#000;border:1px solid var(--line);border-radius:var(--radius);padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
-.dark-need-card::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80%;height:40px;background:radial-gradient(ellipse at top, rgba(242,166,90,0.15), transparent 70%)}
-.dark-need-card h3{color:var(--gold-light);font-size:1.4rem}
-.dark-need-card p{font-size:0.95rem;color:var(--mute);margin-bottom:16px}
-.dark-need-card input{width:100%;padding:14px;border-radius:var(--radius-sm);border:1px solid var(--line);margin-top:16px;font:inherit;background:rgba(255,255,255,0.05);color:#fff}
-.dark-need-card input:focus{outline:none;border-color:var(--moss)}
-
-/* Facilitator Dashboard */
-.layout-split{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-@media(max-width:900px){.layout-split{grid-template-columns:1fr}}
-.protocol-panel{background:var(--bg-light);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
-.phase-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
-.phase-btn{padding:8px 14px;border-radius:20px;background:transparent;border:1px solid var(--line);font-size:0.75rem;font-weight:600;color:var(--mute);transition:all 0.2s}
-.phase-btn.active{background:var(--moss);color:#000;border-color:var(--moss);box-shadow:0 0 15px rgba(0,229,255,0.4)}
-.script-box{background:rgba(0,229,255,0.05);border-left:3px solid var(--moss);padding:20px;margin-bottom:24px;font-style:italic;color:var(--ink);font-size:0.95rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0}
-.data-entry{background:var(--bg-light);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
-.data-entry label{display:block;font-size:0.75rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;color:var(--mute);margin-bottom:6px;margin-top:14px}
-.data-entry input,.data-entry textarea,.data-entry select{width:100%;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);font:inherit;background:rgba(0,0,0,0.2);color:var(--ink)}
-
-/* Certificate */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(5px)}
-.modal.show{display:flex}
-.certificate{background:#0A0E14;border:1px solid var(--gold);color:var(--ink);width:100%;max-width:600px;padding:48px;border-radius:var(--radius);position:relative;box-shadow:0 0 100px rgba(242,166,90,0.1)}
-.cert-front,.cert-back{display:none}
-.cert-front.active,.cert-back.active{display:block}
-
-/* Old App specific things */
-.layer-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
-.layer-bar-item{background:var(--bg-light);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all var(--transition)}
-.layer-bar-item .lbi-track{width:120px;height:8px;background:var(--line);border-radius:4px;overflow:hidden;flex-shrink:0}
-.layer-bar-item .lbi-fill{height:100%;border-radius:4px;transition:width 1s ease}
-.sticky-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
-@media(max-width:520px){.sticky-grid{grid-template-columns:1fr}}
-.sticky-note{position:relative;padding:16px;border-radius:4px;background:#2B3B4A;box-shadow:2px 3px 0 rgba(0,0,0,.2);transition:all var(--transition);cursor:pointer;color:var(--ink);border:1px solid var(--line)}
-.sticky-note:hover{transform:translateY(-2px);border-color:var(--moss)}
+  /* Certificate Modal */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+  .modal.show { display: flex; }
+  .certificate { background: #0A0E14; border: 1px solid var(--gold); color: var(--ink); width: 100%; max-width: 600px; padding: 48px; border-radius: var(--radius); position: relative; box-shadow: 0 0 100px rgba(242,166,90,0.1); }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <svg viewBox="0 0 40 40" width="36" height="36"><circle cx="20" cy="12" r="6" fill="var(--gold)"/><rect x="18" y="14" width="4" height="20" fill="var(--gold)"/><circle cx="12" cy="20" r="4" fill="var(--gold)" opacity=".6"/><circle cx="28" cy="20" r="4" fill="var(--gold)" opacity=".6"/></svg>
-      <span>Tree of Needs</span>
-    </div>
-    <nav class="nav">
-      <button class="nav-item active" data-page="facilitator"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Facilitator View</button>
-      <button class="nav-item" data-page="mum-tree"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 5 5 5 9c0 2 1 4 3 5-2 1-3 3-3 5v3h14v-3c0-2-1-4-3-5 2-1 3-3 3-5 0-4-3-7-7-7z"/></svg>Participant View</button>
-    </nav>
-    <div class="sidebar-footer">
-      <a href="#" onclick="return false">About</a>
-      <a href="#" onclick="return false">Privacy</a>
-      <p style="margin-top:8px">Reflection tool, not therapy or diagnosis.</p>
-    </div>
-  </aside>
+
+<div class="app-container">
   
-  <div class="main">
-    
-    <!-- FACILITATOR VIEW -->
-    <div class="page active" id="page-facilitator">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-        <h1 style="color: var(--gold);">Facilitator Dashboard</h1>
-        <div>
-          <button class="btn btn-outline btn-small" onclick="openCert()">View Certificate</button>
-          <button class="btn btn-primary btn-small" onclick="exportData()">Export JSON</button>
-        </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('facilitator')">Facilitator Dashboard</button>
+    <button class="nav-tab" onclick="switchView('participant')">Participant Screen</button>
+  </div>
+
+  <!-- ===================== FACILITATOR VIEW ===================== -->
+  <div id="facilitator-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h1 style="color: var(--gold);">Facilitator Guide</h1>
+      <div>
+        <button class="btn small o" onclick="openCert()">View Certificate</button>
+        <button class="btn small" onclick="downloadJSON()">Export JSON</button>
       </div>
-      
-      <div class="layout-split">
-        <div>
-          <div class="phase-nav" id="phase-nav"></div>
-          <div class="protocol-panel" id="protocol-content"></div>
+    </div>
+    
+    <div class="layout-split">
+      <div>
+        <!-- Phase 1: Gate -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 1: The Gate</h3>
+          <div class="script-box">
+            "Hi [Name]. Thanks for making the time today. I know with a 2-year-old and two older kids, your time is basically a luxury right now.<br><br>Before we start, I want to remind you that this is a guided reflection, not therapy or diagnosis. You can skip any question, change your mind, or stop at any time. If anything feels too heavy, we pause.<br><br>Are you still happy to take part today? And are you comfortable with me recording this session?"
+          </div>
+          <div class="data-entry">
+            <label>Recording Consent Given?</label>
+            <select id="fac-recording"><option value="Yes">Yes</option><option value="No">No</option></select>
+          </div>
         </div>
-        <div>
-          <div class="data-entry" style="position: sticky; top: 24px;">
-            <h3 style="color: var(--gold); margin-bottom: 8px;">Data Capture</h3>
-            <p style="font-size: 0.85rem; color: var(--mute); margin-bottom: 16px;">Enter her verbatim words here. Click Export at the top when done.</p>
-            
-            <label>Participant ID</label>
-            <input type="text" id="input-participant" placeholder="TN-001" oninput="saveFacData()">
 
-            <label>Baseline — Why today?</label>
-            <textarea id="input-why-today" oninput="saveFacData()"></textarea>
+        <!-- Phase 2: Baseline -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 2: Baseline</h3>
+          <div class="script-box">
+            1. "Why do you want to do this today?"<br>
+            2. "Before we start, what do you think your biggest need is right now?"<br>
+            3. "If this session is useful, what would be different for you afterward—not in your whole life, but in one small, observable way?"
+          </div>
+          <div class="data-entry">
+            <label>Why today? (Verbatim)</label>
+            <textarea id="fac-baseline-1" rows="2"></textarea>
+            <label>Biggest need? (Verbatim)</label>
+            <textarea id="fac-baseline-2" rows="2"></textarea>
+            <label>Small observable outcome? (Verbatim)</label>
+            <textarea id="fac-baseline-3" rows="2"></textarea>
+          </div>
+        </div>
 
-            <label>Baseline — Biggest need</label>
-            <textarea id="input-biggest-need" oninput="saveFacData()"></textarea>
+        <!-- Phase 3 & 4: The Tree -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 3 & 4: The Tree</h3>
+          <div class="script-box">
+            "The Tree is not a ladder. You don't have to fix the bottom first. Today's tree only needs to be honest."<br><br>
+            "Where do you feel strain, growth, protection, or possibility today?"
+          </div>
+          <div class="data-entry">
+            <label>Did she skip Roots/Trunk?</label>
+            <select id="fac-skipped-roots">
+              <option value="No">No, she looked at them.</option>
+              <option value="Yes">Yes, she declined.</option>
+            </select>
+            <label>Failure Log (Exact Quote if something didn't fit)</label>
+            <textarea id="fac-failure-log" rows="3" placeholder="e.g., 'I can't put my need for a break in Roots, it belongs in Leaves.'"></textarea>
+          </div>
+        </div>
 
-            <label>Baseline — Useful outcome</label>
-            <textarea id="input-useful-outcome" oninput="saveFacData()"></textarea>
-
-            <label>Soft Dive Choice</label>
-            <input type="text" id="input-soft-dive" oninput="saveFacData()">
-
-            <label>Mirror tension & explanation</label>
-            <textarea id="input-mirror" oninput="saveFacData()"></textarea>
-
-            <label>Realism Judged</label>
-            <select id="input-realism" onchange="saveFacData()">
-              <option value="">Select...</option>
+        <!-- Phase 7: The Flinch -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 7: The Flinch</h3>
+          <div class="script-box">
+            "There is a harder section about needs that can look ugly from the outside: rage, the need to hide, the need to control everything. These are not bad needs. They are often protections. Do you want to go there?"
+          </div>
+          <div class="data-entry">
+            <label>Dark Needs Consented?</label>
+            <select id="fac-dark-needs">
+              <option value="Not offered">Not offered</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
-              <option value="Partly">Partly</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Phase 8: The Anchor -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 8: The Anchor</h3>
+          <div class="script-box">
+            "This tree is not a project to perfect. What would 'enough' look like for you this season—not perfect, not permanently fixed, but enough?"
+          </div>
+          <div class="data-entry">
+            <label>Enough Definition (Verbatim)</label>
+            <textarea id="fac-enough" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Phase 10: The Return -->
+        <div class="protocol-panel">
+          <h3 style="color: var(--cyan);">Phase 10: The Return</h3>
+          <div class="script-box">
+            "At the start, you said your biggest need was [Read her baseline answer]. What do you say now?"
+          </div>
+          <div class="data-entry">
+            <label>Final Biggest Need (Verbatim)</label>
+            <textarea id="fac-final-need" rows="2"></textarea>
+            <label>Session Outcome</label>
+            <select id="fac-outcome">
+              <option value="Changed">Changed</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Deepened">Deepened</option>
+              <option value="Untouched">Untouched</option>
               <option value="Unclear">Unclear</option>
             </select>
-
-            <label>Failure Logs / Exact Quote</label>
-            <textarea id="input-failures" oninput="saveFacData()"></textarea>
-
-            <label>Dark Needs Consented</label>
-            <select id="input-dark-needs" onchange="saveFacData()">
-              <option value="">Select...</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-              <option value="Not offered">Not offered</option>
-            </select>
-
-            <label>Enough Definition</label>
-            <textarea id="input-enough" oninput="saveFacData()"></textarea>
-
-            <label>Final — Biggest need</label>
-            <textarea id="input-final-need" oninput="saveFacData()"></textarea>
-
-            <label>Session Outcome</label>
-            <input type="text" id="input-outcome" oninput="saveFacData()">
-
-            <label>Facilitator Reflexivity</label>
-            <textarea id="input-reflexivity" oninput="saveFacData()" style="min-height: 100px;"></textarea>
-
-            <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="loadMumData()">Refresh Participant Data</button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- PARTICIPANT VIEW (MUM) -->
-    <div class="page" id="page-mum-tree">
+      <!-- Right Side: Live Participant Data -->
+      <div>
+        <div class="card" style="position: sticky; top: 24px; background: #000;">
+          <h3 style="color: var(--gold-light); margin-bottom: 16px;">Live Participant Data</h3>
+          <p style="font-size: 0.85rem; color: var(--mute); margin-bottom: 16px;">This updates as she taps on her screen.</p>
+          <div id="live-data-display" style="font-size: 0.9rem; line-height: 1.8;">
+            <em style="color: var(--mute);">Waiting for her to start...</em>
+          </div>
+          <button class="btn small o" style="width: 100%; margin-top: 20px;" onclick="refreshLiveData()">Refresh Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PARTICIPANT VIEW ===================== -->
+  <div id="participant-view">
+    
+    <!-- Step 1: Build Tree -->
+    <div id="mum-step-tree">
+      <h1 style="text-align:center; color: var(--gold); margin-bottom: 8px;">Your Tree</h1>
+      <p style="text-align:center; color: var(--mute); margin-bottom: 32px;">Tap a layer to add what is true today.</p>
       
-      <!-- STEP 1: TREE -->
-      <div id="mum-main">
-        <h1 style="text-align:center; margin-bottom: 12px; color: var(--gold);">Your Map</h1>
-        <p style="text-align:center; color: var(--mute); margin-bottom: 40px; font-size: 0.95rem;">Type what is true for you today. There is no balanced tree. Today's tree only needs to be honest.</p>
-        
-        <div id="mum-tree-container"></div>
+      <div id="mum-tree-container"></div>
 
-        <div class="tree-layer-block" style="border-color: var(--hot); box-shadow: inset 0 0 40px rgba(224,138,154,0.05);">
-          <h3 style="color: var(--hot);">Things that don't fit</h3>
-          <p class="layer-desc">If something doesn't belong in the layers above, place it here.</p>
-          <textarea id="mum-misfit" placeholder="Type here..." oninput="saveMumData()"></textarea>
-        </div>
-
-        <button class="btn btn-primary" style="width:100%; margin-top:20px; justify-content:center;" onclick="showDarkNeeds()">Next: The Flinch</button>
+      <div class="tree-layer" style="border-color: var(--warn); cursor: default;" onclick="openSheet('misfit')">
+        <h3 style="color: var(--warn);">Things that don't fit</h3>
+        <p class="layer-desc">If something doesn't belong in the layers above, tap here.</p>
+        <div class="chips" id="misfit-chips"></div>
       </div>
 
-      <!-- STEP 2: DARK NEEDS -->
-      <div id="mum-dark-needs" style="display:none;">
-        <h1 style="text-align:center; margin-bottom: 12px; color: var(--gold);">The Flinch</h1>
-        <p style="text-align:center; color: var(--mute); margin-bottom: 40px; font-size: 0.95rem;">Some needs look ugly from the outside. Choose the two that resonate with you.</p>
-        
-        <div id="dark-needs-list"></div>
-
-        <button class="btn btn-primary" style="width:100%; margin-top:20px; justify-content:center;" onclick="finishMumData()">Finish</button>
-      </div>
-
-      <!-- STEP 3: CERTIFICATE -->
-      <div id="mum-certificate" style="display:none;">
-        <h1 style="text-align:center; margin-bottom: 20px; color: var(--gold);">Your Certificate</h1>
-        <p style="text-align:center; color: var(--mute); margin-bottom: 30px;">Screenshot this to keep it.</p>
-        <div class="certificate" style="margin:0 auto;">
-          <h2 style="font-family:var(--font-display); text-align:center; color: var(--gold); font-size: 2rem;">The Tree of Needs</h2>
-          <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"This is a practice, not a test."</p>
-          <div style="margin-bottom:24px;">
-            <strong style="color: var(--moss); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Your Tree</strong>
-            <div id="cert-tree" style="font-size: 0.95rem; margin-top:12px; line-height: 1.8;"></div>
-          </div>
-          <div style="margin-bottom:24px;">
-            <strong style="color: var(--moss); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">What "enough" looks like</strong>
-            <p id="cert-enough" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--gold);"></p>
-          </div>
-        </div>
-      </div>
-
+      <button class="btn" style="width: 100%; margin-top: 20px;" onclick="showDarkNeeds()">Next: The Flinch</button>
     </div>
+
+    <!-- Step 2: Dark Needs -->
+    <div id="mum-step-dark" style="display: none;">
+      <h1 style="text-align:center; color: var(--gold); margin-bottom: 8px;">The Flinch</h1>
+      <p style="text-align:center; color: var(--mute); margin-bottom: 32px;">Some needs look ugly from the outside. Choose the two that resonate with you.</p>
+      
+      <div id="dark-needs-list"></div>
+
+      <button class="btn" style="width: 100%; margin-top: 20px;" onclick="finishParticipantData()">Finish</button>
+    </div>
+
+    <!-- Step 3: Certificate -->
+    <div id="mum-step-cert" style="display: none;">
+      <div class="card" style="text-align: center;">
+        <h2 style="color: var(--gold); margin-bottom: 16px;">Your Certificate</h2>
+        <p style="color: var(--mute); margin-bottom: 24px;">Screenshot this to keep it.</p>
+        <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 24px; border-radius: 12px;">
+          <h3 style="color: var(--gold-light); margin-bottom: 12px;">The Tree of Needs</h3>
+          <div id="cert-display"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BOTTOM SHEET ===================== -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet(event)">
+  <div class="sheet-content" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <h2 id="sheet-title">Add Needs</h2>
+      <button class="btn o small" onclick="closeSheet(event)">Done</button>
+    </div>
+    <input type="text" class="search-input" id="sheet-search" placeholder="Search all needs or type your own..." onkeyup="filterNeeds()" onkeypress="addCustomNeed(event)">
+    <div id="sheet-needs-container"></div>
   </div>
 </div>
 
@@ -284,189 +271,179 @@ textarea{min-height:100px;resize:vertical}
       <h2 style="font-family:var(--font-display); text-align:center; color: var(--gold); font-size: 2rem;">The Tree of Needs</h2>
       <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"This is a practice, not a test."</p>
       <div style="margin-bottom:24px;">
-        <strong style="color: var(--moss); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Her Tree</strong>
+        <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Her Tree</strong>
         <div id="cert-tree-modal" style="font-size: 0.95rem; margin-top:12px; line-height: 1.8;"></div>
       </div>
       <div style="margin-bottom:24px;">
-        <strong style="color: var(--moss); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">What "enough" looks like</strong>
+        <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">What "enough" looks like</strong>
         <p id="cert-enough-modal" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--gold);"></p>
-      </div>
-      <div style="text-align:center; margin-top:40px;">
-        <button class="btn btn-outline btn-small" onclick="flipCert()">Flip to Failure Log</button>
-      </div>
-    </div>
-    <div class="cert-back">
-      <h2 style="font-family:var(--font-display); text-align:center; color: var(--hot); font-size: 2rem;">The Falsification Log</h2>
-      <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"Where did this framework fail you today?"</p>
-      <div style="margin-bottom:24px;">
-        <strong style="color: var(--hot); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Things she wrote that didn't fit</strong>
-        <p id="cert-failure-modal" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--ink);"></p>
-      </div>
-      <div style="text-align:center; margin-top:40px;">
-        <button class="btn btn-outline btn-small" onclick="flipCert()">Back to Tree</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // Navigation
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(`page-${btn.dataset.page}`).classList.add('active');
-    });
-  });
+  // --- THE FULL NEEDS LIBRARY ---
+  const NEEDS_LIBRARY = {
+    roots: ["Clean air and water", "Nutritious food", "Rest and sleep", "Shelter", "Access to shelter", "Physical safety", "Stability and consistency", "Health", "Access to healthcare", "Sensory comfort", "Movement and exercise", "Sunlight", "Freedom from pain", "Sexual needs / intimacy"],
+    trunk: ["Autonomy", "Independence", "Authenticity", "Integrity", "Freedom", "Self-expression", "Self-knowledge", "Privacy", "Identity", "Consent", "Identity affirmation", "Self-advocacy", "Understanding", "Clarity", "Learning and growth", "Challenge", "Creativity", "Stimulation", "Inspiration", "Curiosity", "Meaning-making", "Structure", "Mastery"],
+    branches: ["Emotional safety", "Recognition", "Acceptance", "Validation", "Affection", "Support", "Companionship", "Empathy", "Trust", "Belonging", "Mutuality", "Connection", "Intimacy", "Love", "Compassion", "Peer community", "Freedom from ableism", "Mentorship", "Social flexibility"],
+    leaves: ["Play", "Humor", "Leisure", "Relaxation", "Fun", "Beauty", "Adventure", "Celebration", "Playful creativity", "Production"],
+    fruits: ["Purpose", "Contribution", "Impact", "Growth", "Fulfillment", "Service", "Spirituality", "Gratitude", "Transcendence"],
+    misfit: ["Rest and sleep", "Connection", "Identity", "Purpose", "Support"] // Fallbacks
+  };
 
-  // Data State
+  const DARK_NEEDS = [
+    { id: "control", title: "Control", desc: "The need to know what happens next.", shadow: "You micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
+    { id: "attention", title: "Attention", desc: "The need for someone to register you exist.", shadow: "You post provocatively or go silent hoping someone notices.", integrated: "Say it plainly: 'I need twenty minutes of your attention.'" },
+    { id: "anger", title: "Anger", desc: "The need to push back. Anger shows where your limits are.", shadow: "You snap at a dirty dishwasher or swallow it until you get headaches.", integrated: "Name it early: 'I'm getting annoyed. I need a minute.'" },
+    { id: "freedom", title: "Freedom from Responsibility", desc: "The need to put it down.", shadow: "You ignore bills for months or carry everything until you resent everyone.", integrated: "Pick the oldest thing you're avoiding and do five minutes of it." },
+    { id: "dependency", title: "Dependency", desc: "The need to rely on someone.", shadow: "You text 'are you mad at me?' after a short reply.", integrated: "Tell one person a real problem and say what you need." },
+    { id: "specialness", title: "Specialness", desc: "The need to feel like more than the crowd.", shadow: "You feel a sting when a friend succeeds.", integrated: "Choose one skill and practise it with no audience." }
+  ];
+
   const LAYERS = [
     { id: "fruits", name: "Fruits", desc: "Meaning and contribution", color: "#8A7BAE" },
     { id: "leaves", name: "Leaves", desc: "Rest, play, output", color: "#6E9AB8" },
     { id: "branches", name: "Branches", desc: "Being seen, held, connected", color: "#3B8EA8" },
     { id: "trunk", name: "Trunk", desc: "Who you are and what you choose", color: "#4A82B3" },
-    { id: "roots", name: "Roots", desc: "Rest, safety, your body", color: "#6B7F94" }
+    { id: "roots", name: "Roots", desc: "Rest, safety, your body", color: "#6B7F94" },
+    { id: "misfit", name: "Doesn't Fit", desc: "Things that don't belong above", color: "#E08A9A" }
   ];
 
-  const DARK_NEEDS = [
-    { id: "control", title: "Control", desc: "The need to know what happens next. Underneath sits a fear of being blamed.", shadow: "You rewrite work, check phones, or micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
-    { id: "attention", title: "Attention", desc: "The need for another person to register that you exist.", shadow: "You post provocatively, tell dramatic stories, or go silent hoping someone notices.", integrated: "Say it plainly: 'I've had a rough week and I'd like twenty minutes of your attention.'" },
-    { id: "anger", title: "Aggression / Anger", desc: "The need to push back. Anger carries information about where your limits are.", shadow: "You snap at a dirty dishwasher or swallow it until you get headaches.", integrated: "Name it early: 'I'm getting annoyed. I need a minute.' Give it a physical outlet." },
-    { id: "freedom", title: "Freedom from Responsibility", desc: "The need to put it down. Needing this is human, not lazy.", shadow: "You ignore bills for months or carry everything until you resent everyone.", integrated: "Pick the oldest thing you're avoiding and do five minutes of it." },
-    { id: "dependency", title: "Dependency", desc: "The need to rely on someone and trust they'll be there.", shadow: "You text 'are you mad at me?' after a short reply, or decide you need no one.", integrated: "Tell one person a real problem and say what you need." },
-    { id: "specialness", title: "Specialness", desc: "The need to feel like more than one of the crowd.", shadow: "You feel a sting when a friend succeeds, or hide your work so it can't be judged.", integrated: "Choose one skill and practise it for 20 minutes a day with no audience." }
-  ];
+  let pData = {
+    tree: { fruits: [], leaves: [], branches: [], trunk: [], roots: [], misfit: [] },
+    darkNeeds: []
+  };
+  let currentSheetLayer = null;
 
-  let mumData = { fruits: "", leaves: "", branches: "", trunk: "", roots: "", misfit: "", darkNeeds: [], enough: "", failureLog: "" };
-  let facData = {};
-
-  function loadData() {
-    const savedMum = localStorage.getItem('strictMumData');
-    if (savedMum) mumData = JSON.parse(savedMum);
-    
-    const savedFac = localStorage.getItem('strictFacData');
-    if (savedFac) facData = JSON.parse(savedFac);
+  // --- NAVIGATION ---
+  function switchView(view) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('facilitator-view').style.display = view === 'facilitator' ? 'block' : 'none';
+    document.getElementById('participant-view').style.display = view === 'participant' ? 'block' : 'none';
+    if (view === 'participant') renderParticipantTree();
   }
 
-  function saveMumData() {
-    LAYERS.forEach(l => {
-      const el = document.getElementById(`mum-${l.id}`);
-      if (el) mumData[l.id] = el.value;
-    });
-    const misfitEl = document.getElementById('mum-misfit');
-    if (misfitEl) mumData.misfit = misfitEl.value;
-    localStorage.setItem('strictMumData', JSON.stringify(mumData));
-  }
-
-  function saveFacData() {
-    facData = {
-      participant: document.getElementById('input-participant').value,
-      whyToday: document.getElementById('input-why-today').value,
-      biggestNeed: document.getElementById('input-biggest-need').value,
-      usefulOutcome: document.getElementById('input-useful-outcome').value,
-      softDive: document.getElementById('input-soft-dive').value,
-      mirror: document.getElementById('input-mirror').value,
-      realism: document.getElementById('input-realism').value,
-      failures: document.getElementById('input-failures').value,
-      darkNeeds: document.getElementById('input-dark-needs').value,
-      enough: document.getElementById('input-enough').value,
-      finalNeed: document.getElementById('input-final-need').value,
-      outcome: document.getElementById('input-outcome').value,
-      reflexivity: document.getElementById('input-reflexivity').value
-    };
-    localStorage.setItem('strictFacData', JSON.stringify(facData));
-  }
-
-  function exportData() {
-    loadMumData(); 
-    const exportPayload = {
-      participant_id: facData.participant || "UNKNOWN",
-      baseline_why_today: facData.whyToday,
-      baseline_biggest_need: facData.biggestNeed,
-      baseline_useful_outcome: facData.usefulOutcome,
-      soft_dive_choice: facData.softDive,
-      mirror_tension: facData.mirror,
-      realism_judged: facData.realism,
-      failure_logs: facData.failures,
-      dark_needs_consented: facData.darkNeeds,
-      enough_definition: facData.enough,
-      final_biggest_need: facData.finalNeed,
-      session_outcome: facData.outcome,
-      facilitator_reflexivity: facData.reflexivity,
-      participant_tree: mumData
-    };
-
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `TON_${facData.participant || 'Session'}.json`);
-    document.body.appendChild(downloadAnchorNode); 
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-  }
-
-  function loadMumData() {
-    const savedMum = localStorage.getItem('strictMumData');
-    if (savedMum) {
-      const m = JSON.parse(savedMum);
-      const output = `
---- PARTICIPANT TREE DATA ---
-Roots: ${m.roots || '[Empty]'}
-Trunk: ${m.trunk || '[Empty]'}
-Branches: ${m.branches || '[Empty]'}
-Leaves: ${m.leaves || '[Empty]'}
-Fruits: ${m.fruits || '[Empty]'}
-Doesn't fit anywhere: ${m.misfit || '[Empty]'}
-Dark Needs Chosen: ${m.darkNeeds ? m.darkNeeds.map(d=>d.id).join(", ") : '[None]'}
-      `;
-      alert(output);
-    } else {
-      alert("No participant data found yet.");
-    }
-  }
-
-  function populateFacInputs() {
-    if (facData.participant) document.getElementById('input-participant').value = facData.participant;
-    if (facData.whyToday) document.getElementById('input-why-today').value = facData.whyToday;
-    if (facData.biggestNeed) document.getElementById('input-biggest-need').value = facData.biggestNeed;
-    if (facData.usefulOutcome) document.getElementById('input-useful-outcome').value = facData.usefulOutcome;
-    if (facData.softDive) document.getElementById('input-soft-dive').value = facData.softDive;
-    if (facData.mirror) document.getElementById('input-mirror').value = facData.mirror;
-    if (facData.realism) document.getElementById('input-realism').value = facData.realism;
-    if (facData.failures) document.getElementById('input-failures').value = facData.failures;
-    if (facData.darkNeeds) document.getElementById('input-dark-needs').value = facData.darkNeeds;
-    if (facData.enough) document.getElementById('input-enough').value = facData.enough;
-    if (facData.finalNeed) document.getElementById('input-final-need').value = facData.finalNeed;
-    if (facData.outcome) document.getElementById('input-outcome').value = facData.outcome;
-    if (facData.reflexivity) document.getElementById('input-reflexivity').value = facData.reflexivity;
-  }
-
-  function renderMumView() {
+  // --- PARTICIPANT LOGIC ---
+  function renderParticipantTree() {
     const container = document.getElementById('mum-tree-container');
-    if(!container) return;
     container.innerHTML = '';
     
-    LAYERS.forEach(layer => {
+    LAYERS.slice(0, 5).forEach(layer => {
       const div = document.createElement('div');
-      div.className = 'tree-layer-block';
+      div.className = 'tree-layer';
       div.style.setProperty('--layer-color', layer.color);
+      div.onclick = () => openSheet(layer.id);
       
+      const chipsHtml = pData.tree[layer.id].map(need => {
+        const isCustom = !NEEDS_LIBRARY[layer.id].includes(need) && !NEEDS_LIBRARY.misfit.includes(need);
+        return `<span class="chip on ${isCustom ? 'custom' : ''}">${need}</span>`;
+      }).join('');
+
       div.innerHTML = `
         <h3>${layer.name}</h3>
         <div class="layer-desc">${layer.desc}</div>
-        <textarea id="mum-${layer.id}" placeholder="Type what belongs here..." oninput="saveMumData()">${mumData[layer.id] || ''}</textarea>
+        <div class="chips">${chipsHtml || '<span style="font-size:0.85rem; color:var(--mute); font-style:italic;">Tap to add...</span>'}</div>
       `;
       container.appendChild(div);
     });
-    
-    const misfit = document.getElementById('mum-misfit');
-    if(misfit) misfit.value = mumData.misfit || '';
+
+    // Render misfit chips
+    const misfitChips = pData.tree.misfit.map(need => `<span class="chip on custom">${need}</span>`).join('');
+    document.getElementById('misfit-chips').innerHTML = misfitChips;
   }
 
+  function openSheet(layerId) {
+    currentSheetLayer = layerId;
+    const layer = LAYERS.find(l => l.id === layerId);
+    document.getElementById('sheet-title').innerText = layer.name;
+    document.getElementById('sheet-title').style.color = layer.color;
+    document.getElementById('sheet-search').value = '';
+    
+    // Highlight the active layer's needs first, then list others
+    renderSheetNeeds('');
+    
+    document.getElementById('sheet-overlay').classList.add('show');
+  }
+
+  function closeSheet(e) {
+    if(e) e.stopPropagation();
+    document.getElementById('sheet-overlay').classList.remove('show');
+    renderParticipantTree();
+    saveParticipantData();
+  }
+
+  function renderSheetNeeds(filterText) {
+    const container = document.getElementById('sheet-needs-container');
+    container.innerHTML = '';
+    
+    let needsToShow = [];
+    
+    if (filterText) {
+      // Search across ALL layers
+      Object.keys(NEEDS_LIBRARY).forEach(layer => {
+        NEEDS_LIBRARY[layer].forEach(need => {
+          if (need.toLowerCase().includes(filterText.toLowerCase()) && !needsToShow.includes(need)) {
+            needsToShow.push(need);
+          }
+        });
+      });
+    } else {
+      // Show current layer's needs
+      needsToShow = NEEDS_LIBRARY[currentSheetLayer] || [];
+    }
+
+    needsToShow.forEach(need => {
+      const isOn = pData.tree[currentSheetLayer].includes(need);
+      const btn = document.createElement('button');
+      btn.className = `need-option ${isOn ? 'on' : ''}`;
+      btn.innerText = need;
+      btn.onclick = () => toggleNeed(currentSheetLayer, need);
+      container.appendChild(btn);
+    });
+
+    if (needsToShow.length === 0 && filterText) {
+      container.innerHTML = `<p style="color:var(--mute); font-size:0.9rem;">No needs found. Press Enter to add "${filterText}" as a custom need.</p>`;
+    }
+  }
+
+  function toggleNeed(layerId, need) {
+    const arr = pData.tree[layerId];
+    const idx = arr.indexOf(need);
+    if (idx > -1) arr.splice(idx, 1);
+    else arr.push(need);
+    saveParticipantData();
+    renderSheetNeeds(document.getElementById('sheet-search').value);
+    renderParticipantTree();
+  }
+
+  function filterNeeds() {
+    renderSheetNeeds(document.getElementById('sheet-search').value);
+  }
+
+  function addCustomNeed(e) {
+    if (e.key === 'Enter' && e.target.value.trim() !== '') {
+      const val = e.target.value.trim();
+      if (!pData.tree[currentSheetLayer].includes(val)) {
+        pData.tree[currentSheetLayer].push(val);
+      }
+      e.target.value = '';
+      filterNeeds();
+      renderParticipantTree();
+      saveParticipantData();
+    }
+  }
+
+  function saveParticipantData() {
+    localStorage.setItem('participantData', JSON.stringify(pData));
+  }
+
+  // --- DARK NEEDS ---
   function showDarkNeeds() {
-    document.getElementById('mum-main').style.display = 'none';
-    document.getElementById('mum-dark-needs').style.display = 'block';
+    document.getElementById('mum-step-tree').style.display = 'none';
+    document.getElementById('mum-step-dark').style.display = 'block';
     
     const container = document.getElementById('dark-needs-list');
     container.innerHTML = '';
@@ -474,19 +451,17 @@ Dark Needs Chosen: ${m.darkNeeds ? m.darkNeeds.map(d=>d.id).join(", ") : '[None]
     DARK_NEEDS.forEach(dn => {
       const div = document.createElement('div');
       div.className = 'dark-need-card';
-      
-      const isSelected = mumData.darkNeeds.find(d => d.id === dn.id);
+      const isSelected = pData.darkNeeds.find(d => d.id === dn.id);
       
       div.innerHTML = `
         <h3>${dn.title}</h3>
         <p>${dn.desc}</p>
         ${isSelected ? 
-          `<div style="border-top:1px solid #2B3B4A; padding-top:20px; margin-top:20px;">
-            <p style="font-size:0.9rem; color:var(--hot); margin-bottom:12px;"><strong>Shadow side:</strong> ${dn.shadow}</p>
-            <p style="font-size:0.9rem; color:var(--moss); margin-bottom:16px;"><strong>Integrated side:</strong> ${dn.integrated}</p>
-            <input type="text" placeholder="Write your own version of this behaviour..." value="${isSelected.custom || ''}" oninput="saveDarkNeed('${dn.id}', this.value)">
+          `<div style="border-top:1px solid #2B3B4A; padding-top:12px; margin-top:12px;">
+            <p class="shadow"><strong>Shadow:</strong> ${dn.shadow}</p>
+            <p class="integrated"><strong>Integrated:</strong> ${dn.integrated}</p>
            </div>` : 
-          `<button class="btn btn-outline" style="border-color:var(--gold); color:var(--gold);" onclick="toggleDarkNeed('${dn.id}')">This is me</button>`
+          `<button class="btn small o" style="border-color:var(--gold); color:var(--gold);" onclick="toggleDarkNeed('${dn.id}')">This is me</button>`
         }
       `;
       container.appendChild(div);
@@ -494,128 +469,82 @@ Dark Needs Chosen: ${m.darkNeeds ? m.darkNeeds.map(d=>d.id).join(", ") : '[None]
   }
 
   function toggleDarkNeed(id) {
-    if (mumData.darkNeeds.length >= 2) {
+    if (pData.darkNeeds.length >= 2) {
       alert("Please select only the 2 that resonate most.");
       return;
     }
-    mumData.darkNeeds.push({ id: id, custom: "" });
-    saveMumData();
+    pData.darkNeeds.push({ id: id });
+    saveParticipantData();
     showDarkNeeds();
   }
 
-  function saveDarkNeed(id, val) {
-    const item = mumData.darkNeeds.find(d => d.id === id);
-    if (item) item.custom = val;
-    saveMumData();
-  }
-
-  function finishMumData() {
-    let enoughDef = prompt("What does 'enough' look like for you this season?");
-    if (enoughDef) mumData.enough = enoughDef;
+  function finishParticipantData() {
+    document.getElementById('mum-step-dark').style.display = 'none';
+    document.getElementById('mum-step-cert').style.display = 'block';
     
-    let failure = prompt("What did this framework get wrong today? (Optional)");
-    if (failure) mumData.failureLog = failure;
-    
-    document.getElementById('mum-dark-needs').style.display = 'none';
-    document.getElementById('mum-certificate').style.display = 'block';
-    renderCertificate();
-  }
-
-  function renderCertificate() {
-    let treeHtml = '';
+    let certHtml = '';
     LAYERS.forEach(l => {
-      if (mumData[l.id]) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:${l.color}">${l.name}:</strong> ${mumData[l.id]}</p>`;
-    });
-    if (mumData.misfit) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:var(--hot)">Misfit:</strong> ${mumData.misfit}</p>`;
-    
-    document.getElementById('cert-tree').innerHTML = treeHtml;
-    document.getElementById('cert-enough').innerText = mumData.enough || "[Not defined]";
-  }
-
-  function openCert() {
-    let treeHtml = '';
-    LAYERS.forEach(l => {
-      if (mumData[l.id]) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:${l.color}">${l.name}:</strong> ${mumData[l.id]}</p>`;
-    });
-    if (mumData.misfit) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:var(--hot)">Misfit:</strong> ${mumData.misfit}</p>`;
-    
-    document.getElementById('cert-tree-modal').innerHTML = treeHtml;
-    document.getElementById('cert-enough-modal').innerText = mumData.enough || "[Not defined]";
-    document.getElementById('cert-failure-modal').innerText = mumData.failureLog || "[None noted]";
-    
-    document.getElementById('cert-modal').classList.add('show');
-  }
-
-  function flipCert() {
-    document.querySelector('.cert-front').classList.toggle('active');
-    document.querySelector('.cert-back').classList.toggle('active');
-  }
-
-  const PHASES = [
-    { id: 0, title: "Before the call", script: "No participant-facing script. Open Airtable. Confirm participant code, signed consent, recording/photo permissions. Open Tree app. Set calm tone.", data: "Confirm records; check permissions." },
-    { id: 1, title: "1. The Gate", script: "Hi [Name]. Thanks for making the time today. I know with a 2-year-old and two older kids, your time is basically a luxury right now.<br><br>Before we start, I want to remind you that this is a guided reflection, not therapy or diagnosis. You can skip any question, change your mind, or stop at any time. If anything feels too heavy, we pause.<br><br>Are you still happy to take part today? And are you comfortable with me recording this session? You can say no to recording without having to explain why.", data: "Consent reconfirmed at session; Recording used?; Safety Pause." },
-    { id: 2, title: "2. Baseline", script: "1. 'Why do you want to do this today?'<br>2. 'Before we start, what do you think your biggest need is right now?'<br>3. 'If this session is useful, what would be different for you afterward—not in your whole life, but in one small, observable way?'", data: "Capture Baseline — Why today?, Biggest need, Useful outcome (verbatim)." },
-    { id: 3, title: "3. Soft Dive", script: "'Let's start with the lighter stuff. Looking at these cards—Connection, Play, Recognition, Rest—which ones feel most present in your life right now? And which feel missing?'<br><br>'We can stay here, or we can look at the heavier stuff—Roots and Trunk: safety, stability, identity. You choose. There is no correct order.'", data: "Soft Dive choice; Tree map placements." },
-    { id: 4, title: "4. Build the Tree", script: "'The Tree is not a ladder. You don't have to fix the bottom first. A tree can survive with damaged roots if the trunk is strong. There is no balanced tree. Today's tree only needs to be honest.'<br><br>'Where do you feel strain, growth, protection, or possibility today?'<br><br>'This is one way of organising needs. You can disagree with the structure, place something in more than one area, or tell me it doesn't fit anywhere.'", data: "Framework Fit Observed; Tree map placements." },
-    { id: 5, title: "5. The Mirror", script: "'I noticed you placed [X] here, but earlier you mentioned [Y]. I'm not saying this is wrong. I'm curious: how do these live together in your life?'<br><br>'Does this feel like a problem to solve, a tension to hold, or something else?'", data: "Participant explanation; Tension confirmed/rejected." },
-    { id: 6, title: "6. The Falsification", script: "'We're going to look at what's destabilizing you right now, but let's not use the word emergency. What would you call it?'<br><br>'Do you agree with what the framework suggests is your priority? Is it realistic for your actual life?'<br><br>If not realistic: 'Thank you for telling me. What would need to be true for this to become realistic? What constraint is the framework not seeing?'", data: "Framework Fit Observed; Realism Judged; Failure Logs." },
-    { id: 7, title: "7. The Flinch", script: "'There is a harder section about needs that can look ugly from the outside: control, anger, attention, avoidance. These are not bad needs. They are often protections. We put this last because it can be uncomfortable. Do you want to go there?'<br><br>If yes: 'Where does this show up in your tree? What is it protecting? What does it cost you?'<br><br>If no: 'That's completely fine. We don't need to go there.'", data: "Dark Needs Consented (Yes/No/Not offered/Unclear)." },
-    { id: 8, title: "8. The Anchor", script: "'This tree is not a project to perfect. What would enough look like for you this season—not perfect, not permanently fixed, but enough?'<br><br>Optional: 'How would you recognise that in everyday life?'", data: "Enough Definition (verbatim)." },
-    { id: 9, title: "9. The Certificate", script: "'Please note anything that did not fit, felt unhelpful, was missing, or could be improved. It is also okay if nothing comes to mind. Honest feedback is useful whether positive, negative or mixed.'", data: "Failure Logs; Session Outcome." },
-    { id: 10, title: "10. The Return", script: "'At the start, you said your biggest need was ____. What do you say now?'<br><br>'If your answer changed, what changed in how you see it?'<br><br>'If it did not change, did the session confirm something you already knew, deepen it, or leave it untouched?'<br><br>Close: 'Thank you. I will reach out in 3 months to see how your tree is growing. Remember, this is a practice, not a test.'", data: "Final — Biggest need; Final — Useful outcome; End-of-session interpretation." },
-    { id: 11, title: "After the call", script: "Ask yourself: 'Where did I lead her?' 'What did I feel defensive about?' 'What did I want her to say?' 'What did I notice in her body language?' 'Which questions did I rephrase or skip?'", data: "Facilitator Reflexivity Note; Session Data Completeness; Follow-up needed." }
-  ];
-
-  function renderFacilitatorNav() {
-    const nav = document.getElementById('phase-nav');
-    nav.innerHTML = '';
-    PHASES.forEach((p, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'phase-btn';
-      btn.id = `nav-btn-${index}`;
-      btn.innerText = p.title.split('.')[0]; 
-      btn.onclick = () => loadPhase(index);
-      nav.appendChild(btn);
-    });
-  }
-
-  function loadPhase(index) {
-    document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.getElementById(`nav-btn-${index}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    const phase = PHASES[index];
-    const content = document.getElementById('protocol-content');
-    
-    content.innerHTML = `
-      <h2 style="color: var(--gold); margin-bottom: 20px;">${phase.title}</h2>
-      
-      <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; color: var(--mute); margin-bottom: 8px;">Script / Action</div>
-      <div class="script-box">${phase.script}</div>
-      
-      <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; color: var(--mute); margin-bottom: 8px;">Data to capture</div>
-      <p style="font-size: 0.95rem; margin-bottom: 32px; color: var(--moss);">${phase.data}</p>
-      
-      <div style="display:flex; gap:12px;">
-        ${index > 0 ? `<button class="btn btn-outline btn-small" onclick="loadPhase(${index-1})">Back</button>` : ''}
-        ${index < PHASES.length-1 ? `<button class="btn btn-primary btn-small" onclick="loadPhase(${index+1})">Next Phase</button>` : ''}
-      </div>
-    `;
-  }
-
-  // Init
-  loadData();
-  populateFacInputs();
-  renderMumView();
-  renderFacilitatorNav();
-  loadPhase(0);
-
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'strictMumData') {
-      loadData();
-      if(document.getElementById('page-mum-tree').classList.contains('active')) {
-        if(document.getElementById('mum-main').style.display !== 'none') renderMumView();
+      if (pData.tree[l.id].length > 0) {
+        certHtml += `<p style="margin-bottom:8px;"><strong style="color:${l.color}">${l.name}:</strong> ${pData.tree[l.id].join(", ")}</p>`;
       }
+    });
+    
+    document.getElementById('cert-display').innerHTML = certHtml;
+  }
+
+  // --- FACILITATOR LOGIC ---
+  function refreshLiveData() {
+    const data = localStorage.getItem('participantData');
+    if (!data) return;
+    
+    const p = JSON.parse(data);
+    let html = '';
+    
+    LAYERS.forEach(l => {
+      if (p.tree[l.id] && p.tree[l.id].length > 0) {
+        html += `<div style="margin-bottom:12px;"><strong style="color:${l.color}">${l.name}:</strong> ${p.tree[l.id].join(", ")}</div>`;
+      }
+    });
+    
+    if (p.darkNeeds && p.darkNeeds.length > 0) {
+      html += `<div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line);"><strong style="color:var(--gold)">Dark Needs Chosen:</strong> ${p.darkNeeds.map(d => d.id).join(", ")}</div>`;
+    }
+
+    document.getElementById('live-data-display').innerHTML = html || "<em style='color: var(--mute);'>No data yet.</em>";
+  }
+
+  function downloadJSON() {
+    const pData = JSON.parse(localStorage.getItem('participantData') || '{}');
+    const exportData = {
+      participant_tree: pData.tree,
+      dark_needs: pData.darkNeeds,
+      facilitator_notes: {
+        recording: document.getElementById('fac-recording').value,
+        baseline_1: document.getElementById('fac-baseline-1').value,
+        baseline_2: document.getElementById('fac-baseline-2').value,
+        baseline_3: document.getElementById('fac-baseline-3').value,
+        skipped_roots: document.getElementById('fac-skipped-roots').value,
+        failure_log: document.getElementById('fac-failure-log').value,
+        dark_needs_consented: document.getElementById('fac-dark-needs').value,
+        enough_definition: document.getElementById('fac-enough').value,
+        final_need: document.getElementById('fac-final-need').value,
+        outcome: document.getElementById('fac-outcome').value
+      }
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "TON_Session_Export.json");
+    document.body.appendChild(downloadAnchorNode); 
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  }
+
+  // Listen for changes across tabs
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'participantData') {
+      refreshLiveData();
     }
   });
 
