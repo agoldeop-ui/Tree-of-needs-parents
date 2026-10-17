@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tree of Needs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0E14;
+    --bg-light: #121B24;
+    --ink: #E6EEF5;
+    --mute: #7A8D9C;
+    --gold: #F2A65A;
+    --gold-light: #FFCF96;
+    --cyan: #00E5FF;
+    --warn: #E08A9A;
+    --line: #1F2C3A;
+    --radius: 24px;
+    --radius-sm: 12px;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Public Sans', system-ui, sans-serif;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { 
+    font: 16px/1.6 var(--font-body); 
+    background: var(--bg); 
+    color: var(--ink); 
+    padding-bottom: 40px;
+    background-image: radial-gradient(circle at 50% 0%, rgba(242, 166, 90, 0.05) 0%, transparent 50%);
+  }
+  
+  h1, h2, h3 { 
+    font-family: var(--font-display); 
+    line-height: 1.2; 
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  
+  .app-container { max-width: 800px; margin: 0 auto; padding: 24px; }
+  
+  /* Shared UI */
+  .btn { 
+    display: inline-block; 
+    padding: 14px 24px; 
+    border-radius: 40px; 
+    background: linear-gradient(135deg, var(--gold) 0%, #D4843A 100%); 
+    color: #0A0E14; 
+    font-weight: 600; 
+    text-align: center; 
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(242, 166, 90, 0.2);
+    letter-spacing: 0.02em;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(242, 166, 90, 0.4); }
+  .btn.o { 
+    background: transparent; 
+    border: 1px solid var(--mute); 
+    color: var(--ink); 
+    box-shadow: none;
+  }
+  .btn.o:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn.small { padding: 8px 16px; font-size: 0.85rem; }
+  
+  /* Intro Screen */
+  #intro-screen { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh; 
+    text-align: center; 
+    padding: 20px;
+  }
+  #intro-screen h1 { 
+    font-size: 3.5rem; 
+    margin-bottom: 16px; 
+    color: var(--gold-light);
+    text-shadow: 0 0 30px rgba(242, 166, 90, 0.3);
+  }
+  #intro-screen p { color: var(--mute); margin-bottom: 48px; font-size: 1.1rem; }
+  #intro-screen .btn { width: 100%; max-width: 320px; margin-bottom: 16px; font-size: 1.1rem; padding: 18px; }
+
+  /* MUM VIEW (Participant) */
+  #mum-view { display: none; max-width: 600px; margin: 0 auto; animation: fadeIn 1s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .layer-block { 
+    background: var(--bg-light); 
+    border: 1px solid var(--line); 
+    border-radius: var(--radius); 
+    padding: 24px; 
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
+  }
+  .layer-block h3 { 
+    font-size: 1.4rem; 
+    margin-bottom: 4px;
+    color: var(--layer-color);
+    text-shadow: 0 0 15px var(--layer-color);
+  }
+  .layer-block .layer-desc { font-size: 0.9rem; color: var(--mute); margin-bottom: 16px; }
+  .layer-block textarea { 
+    width: 100%; 
+    min-height: 80px; 
+    padding: 16px; 
+    border: 1px solid var(--line); 
+    border-radius: var(--radius-sm); 
+    background: rgba(0,0,0,0.2); 
+    color: var(--ink);
+    font: inherit; 
+    resize: vertical;
+  }
+  .layer-block textarea:focus { outline: none; border-color: var(--cyan); }
+  
+  /* Dark Needs Deck */
+  .dark-need-card { 
+    background: #000; 
+    border: 1px solid var(--line);
+    border-radius: var(--radius); 
+    padding: 32px; 
+    margin-bottom: 24px; 
+    position: relative;
+    overflow: hidden;
+  }
+  .dark-need-card::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 80%; height: 40px;
+    background: radial-gradient(ellipse at top, rgba(242, 166, 90, 0.15), transparent 70%);
+  }
+  .dark-need-card h3 { color: var(--gold-light); font-size: 1.4rem; }
+  .dark-need-card p { font-size: 0.95rem; color: #9AAEC0; margin-bottom: 16px; }
+  .dark-need-card input { 
+    width: 100%; padding: 14px; border-radius: var(--radius-sm); 
+    border: 1px solid var(--line); 
+    margin-top: 16px; font: inherit; background: rgba(255,255,255,0.05); color: #fff; 
+  }
+  .dark-need-card input:focus { outline: none; border-color: var(--cyan); }
+
+  /* FACILITATOR VIEW (Guide) */
+  #facilitator-view { display: none; animation: fadeIn 1s ease; }
+  .layout-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 768px) { .layout-split { grid-template-columns: 1fr; } }
+  
+  .protocol-panel { 
+    background: var(--bg-light); 
+    border: 1px solid var(--line); 
+    border-radius: var(--radius); 
+    padding: 24px; 
+  }
+  .phase-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .phase-btn { 
+    padding: 8px 14px; 
+    border-radius: 20px; 
+    background: transparent; 
+    border: 1px solid var(--line); 
+    font-size: 0.75rem; 
+    font-weight: 600; 
+    color: var(--mute);
+    transition: all 0.2s;
+  }
+  .phase-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+  
+  .script-box { 
+    background: rgba(0, 229, 255, 0.05); 
+    border-left: 3px solid var(--cyan); 
+    padding: 20px; 
+    margin-bottom: 24px; 
+    font-style: italic; 
+    color: var(--ink); 
+    font-size: 1rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .data-entry { 
+    background: var(--bg-light); 
+    border: 1px solid var(--line); 
+    border-radius: var(--radius); 
+    padding: 24px; 
+  }
+  .data-entry label { 
+    display: block; 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    font-weight: 600; 
+    letter-spacing: 0.05em;
+    color: var(--mute); 
+    margin-bottom: 8px; 
+    margin-top: 16px; 
+  }
+  .data-entry input, .data-entry textarea, .data-entry select { 
+    width: 100%; 
+    padding: 12px; 
+    border: 1px solid var(--line); 
+    border-radius: var(--radius-sm); 
+    font: inherit; 
+    background: rgba(0,0,0,0.2); 
+    color: var(--ink);
+  }
+  .data-entry input:focus, .data-entry textarea:focus { outline: none; border-color: var(--cyan); }
+
+  /* Certificate Modal */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+  .modal.show { display: flex; animation: fadeIn 0.3s ease; }
+  .certificate { 
+    background: #0A0E14; 
+    border: 1px solid var(--gold);
+    color: var(--ink); 
+    width: 100%; 
+    max-width: 600px; 
+    padding: 48px; 
+    border-radius: var(--radius); 
+    position: relative; 
+    box-shadow: 0 0 100px rgba(242, 166, 90, 0.1);
+  }
+  .cert-front, .cert-back { display: none; }
+  .cert-front.active, .cert-back.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div id="intro-screen">
+    <h1>Tree of Needs</h1>
+    <p>A guided reflection of what sustains you.</p>
+    <button class="btn" onclick="startApp('facilitator')">I am the Facilitator</button>
+    <button class="btn o" onclick="startApp('mum')">I am the Participant</button>
+  </div>
+
+  <!-- ===================== MUM VIEW ===================== -->
+  <div id="mum-view">
+    <div id="mum-main" style="display:block;">
+      <h1 style="text-align:center; margin-bottom: 12px; color: var(--gold-light);">Your Map</h1>
+      <p style="text-align:center; color: var(--mute); margin-bottom: 40px; font-size: 0.95rem;">There is no balanced tree. Today's tree only needs to be honest.</p>
+      
+      <div id="mum-tree-container"></div>
+
+      <!-- Explicit "Doesn't fit" box -->
+      <div class="layer-block" style="border-color: var(--warn); box-shadow: inset 0 0 40px rgba(224, 138, 154, 0.05);">
+        <h3 style="color: var(--warn); text-shadow: 0 0 15px rgba(224, 138, 154, 0.4);">Things that don't fit</h3>
+        <p class="layer-desc">If something doesn't belong in the layers above, place it here.</p>
+        <textarea id="mum-misfit" placeholder="Type here..." oninput="saveMumData()"></textarea>
+      </div>
+
+      <button class="btn" style="width:100%; margin-top:20px;" onclick="showDarkNeeds()">Next: The Flinch</button>
+    </div>
+
+    <!-- DARK NEEDS SECTION -->
+    <div id="mum-dark-needs" style="display:none;">
+      <h1 style="text-align:center; margin-bottom: 12px; color: var(--gold-light);">The Flinch</h1>
+      <p style="text-align:center; color: var(--mute); margin-bottom: 40px; font-size: 0.95rem;">Some needs look ugly from the outside. Choose the two that resonate with you.</p>
+      
+      <div id="dark-needs-list"></div>
+
+      <button class="btn" style="width:100%; margin-top:20px;" onclick="finishMumData()">Finish</button>
+    </div>
+
+    <!-- CERTIFICATE -->
+    <div id="mum-certificate" style="display:none;">
+      <h1 style="text-align:center; margin-bottom: 20px; color: var(--gold-light);">Your Certificate</h1>
+      <p style="text-align:center; color: var(--mute); margin-bottom: 30px;">Screenshot this to keep it.</p>
+      <div class="certificate">
+        <h2 style="font-family:var(--font-display); text-align:center; color: var(--gold); font-size: 2rem;">The Tree of Needs</h2>
+        <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"This is a practice, not a test."</p>
+        <div style="margin-bottom:24px;">
+          <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Your Tree</strong>
+          <div id="cert-tree" style="font-size: 0.95rem; margin-top:12px; line-height: 1.8;"></div>
+        </div>
+        <div style="margin-bottom:24px;">
+          <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">What "enough" looks like</strong>
+          <p id="cert-enough" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--gold-light);"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FACILITATOR VIEW ===================== -->
+  <div id="facilitator-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <h1 style="color: var(--gold-light);">Facilitator Dashboard</h1>
+      <div>
+        <button class="btn small o" onclick="openCert()">View Certificate</button>
+        <button class="btn small" onclick="exportData()">Export JSON</button>
+      </div>
+    </div>
+    
+    <div class="layout-split">
+      <!-- Left: Protocol & Script -->
+      <div>
+        <div class="phase-nav" id="phase-nav"></div>
+        <div class="protocol-panel" id="protocol-content"></div>
+      </div>
+
+      <!-- Right: Data Entry -->
+      <div>
+        <div class="data-entry" style="position: sticky; top: 24px;">
+          <h3 style="color: var(--gold-light); margin-bottom: 8px;">Data Capture</h3>
+          <p style="font-size: 0.85rem; color: var(--mute); margin-bottom: 16px;">Enter her verbatim words here.</p>
+          
+          <label>Participant ID</label>
+          <input type="text" id="input-participant" placeholder="TN-001" oninput="saveFacData()">
+
+          <label>Baseline — Why today?</label>
+          <textarea id="input-why-today" oninput="saveFacData()"></textarea>
+
+          <label>Baseline — Biggest need</label>
+          <textarea id="input-biggest-need" oninput="saveFacData()"></textarea>
+
+          <label>Baseline — Useful outcome</label>
+          <textarea id="input-useful-outcome" oninput="saveFacData()"></textarea>
+
+          <label>Soft Dive Choice</label>
+          <input type="text" id="input-soft-dive" oninput="saveFacData()">
+
+          <label>Mirror tension & explanation</label>
+          <textarea id="input-mirror" oninput="saveFacData()"></textarea>
+
+          <label>Realism Judged</label>
+          <select id="input-realism" onchange="saveFacData()">
+            <option value="">Select...</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Partly">Partly</option>
+            <option value="Unclear">Unclear</option>
+          </select>
+
+          <label>Failure Logs / Exact Quote</label>
+          <textarea id="input-failures" oninput="saveFacData()"></textarea>
+
+          <label>Dark Needs Consented</label>
+          <select id="input-dark-needs" onchange="saveFacData()">
+            <option value="">Select...</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Not offered">Not offered</option>
+          </select>
+
+          <label>Enough Definition</label>
+          <textarea id="input-enough" oninput="saveFacData()"></textarea>
+
+          <label>Final — Biggest need</label>
+          <textarea id="input-final-need" oninput="saveFacData()"></textarea>
+
+          <label>Session Outcome</label>
+          <input type="text" id="input-outcome" oninput="saveFacData()">
+
+          <label>Facilitator Reflexivity</label>
+          <textarea id="input-reflexivity" oninput="saveFacData()" style="min-height: 100px;"></textarea>
+
+          <button class="btn" style="width:100%; margin-top:20px;" onclick="loadMumData()">Refresh Participant Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Certificate Modal for Facilitator -->
+<div class="modal" id="cert-modal">
+  <div class="certificate">
+    <button style="position:absolute; top:20px; right:24px; font-size:1.5rem; color:var(--mute);" onclick="document.getElementById('cert-modal').classList.remove('show')">&times;</button>
+    <div class="cert-front active">
+      <h2 style="font-family:var(--font-display); text-align:center; color: var(--gold); font-size: 2rem;">The Tree of Needs</h2>
+      <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"This is a practice, not a test."</p>
+      <div style="margin-bottom:24px;">
+        <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Her Tree</strong>
+        <div id="cert-tree-modal" style="font-size: 0.95rem; margin-top:12px; line-height: 1.8;"></div>
+      </div>
+      <div style="margin-bottom:24px;">
+        <strong style="color: var(--cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">What "enough" looks like</strong>
+        <p id="cert-enough-modal" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--gold-light);"></p>
+      </div>
+      <div style="text-align:center; margin-top:40px;">
+        <button class="btn o small" onclick="flipCert()">Flip to Failure Log</button>
+      </div>
+    </div>
+    <div class="cert-back">
+      <h2 style="font-family:var(--font-display); text-align:center; color: var(--warn); font-size: 2rem;">The Falsification Log</h2>
+      <p style="text-align:center; font-style:italic; margin-bottom:30px; color: var(--mute);">"Where did this framework fail you today?"</p>
+      <div style="margin-bottom:24px;">
+        <strong style="color: var(--warn); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Things she wrote that didn't fit</strong>
+        <p id="cert-failure-modal" style="font-size: 0.95rem; margin-top:12px; font-style:italic; color: var(--ink);"></p>
+      </div>
+      <div style="text-align:center; margin-top:40px;">
+        <button class="btn o small" onclick="flipCert()">Back to Tree</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const LAYERS = [
+    { id: "fruits", name: "Fruits", desc: "Meaning and contribution", color: "#8A7BAE" },
+    { id: "leaves", name: "Leaves", desc: "Rest, play, output", color: "#6E9AB8" },
+    { id: "branches", name: "Branches", desc: "Being seen, held, connected", color: "#3B8EA8" },
+    { id: "trunk", name: "Trunk", desc: "Who you are and what you choose", color: "#4A82B3" },
+    { id: "roots", name: "Roots", desc: "Rest, safety, your body", color: "#6B7F94" }
+  ];
+
+  const DARK_NEEDS = [
+    { id: "control", title: "Control", desc: "The need to know what happens next. Underneath sits a fear of being blamed.", shadow: "You rewrite work, check phones, or micromanage. It calms you for an hour.", integrated: "Make two columns: what I can change today, and what I can't." },
+    { id: "attention", title: "Attention", desc: "The need for another person to register that you exist.", shadow: "You post provocatively, tell dramatic stories, or go silent hoping someone notices.", integrated: "Say it plainly: 'I've had a rough week and I'd like twenty minutes of your attention.'" },
+    { id: "anger", title: "Aggression / Anger", desc: "The need to push back. Anger carries information about where your limits are.", shadow: "You snap at a dirty dishwasher or swallow it until you get headaches.", integrated: "Name it early: 'I'm getting annoyed. I need a minute.' Give it a physical outlet." },
+    { id: "freedom", title: "Freedom from Responsibility", desc: "The need to put it down. Needing this is human, not lazy.", shadow: "You ignore bills for months or carry everything until you resent everyone.", integrated: "Pick the oldest thing you're avoiding and do five minutes of it." },
+    { id: "dependency", title: "Dependency", desc: "The need to rely on someone and trust they'll be there.", shadow: "You text 'are you mad at me?' after a short reply, or decide you need no one.", integrated: "Tell one person a real problem and say what you need." },
+    { id: "specialness", title: "Specialness", desc: "The need to feel like more than one of the crowd.", shadow: "You feel a sting when a friend succeeds, or hide your work so it can't be judged.", integrated: "Choose one skill and practise it for 20 minutes a day with no audience." }
+  ];
+
+  let mumData = { fruits: "", leaves: "", branches: "", trunk: "", roots: "", misfit: "", darkNeeds: [], enough: "", failureLog: "" };
+  let facData = {};
+
+  function loadData() {
+    const savedMum = localStorage.getItem('strictMumData');
+    if (savedMum) mumData = JSON.parse(savedMum);
+    
+    const savedFac = localStorage.getItem('strictFacData');
+    if (savedFac) facData = JSON.parse(savedFac);
+  }
+
+  function saveMumData() {
+    LAYERS.forEach(l => {
+      mumData[l.id] = document.getElementById(`mum-${l.id}`).value;
+    });
+    mumData.misfit = document.getElementById('mum-misfit').value;
+    localStorage.setItem('strictMumData', JSON.stringify(mumData));
+  }
+
+  function saveFacData() {
+    facData = {
+      participant: document.getElementById('input-participant').value,
+      whyToday: document.getElementById('input-why-today').value,
+      biggestNeed: document.getElementById('input-biggest-need').value,
+      usefulOutcome: document.getElementById('input-useful-outcome').value,
+      softDive: document.getElementById('input-soft-dive').value,
+      mirror: document.getElementById('input-mirror').value,
+      realism: document.getElementById('input-realism').value,
+      failures: document.getElementById('input-failures').value,
+      darkNeeds: document.getElementById('input-dark-needs').value,
+      enough: document.getElementById('input-enough').value,
+      finalNeed: document.getElementById('input-final-need').value,
+      outcome: document.getElementById('input-outcome').value,
+      reflexivity: document.getElementById('input-reflexivity').value
+    };
+    localStorage.setItem('strictFacData', JSON.stringify(facData));
+  }
+
+  function exportData() {
+    loadMumData(); 
+    const exportPayload = {
+      participant_id: facData.participant || "UNKNOWN",
+      baseline_why_today: facData.whyToday,
+      baseline_biggest_need: facData.biggestNeed,
+      baseline_useful_outcome: facData.usefulOutcome,
+      soft_dive_choice: facData.softDive,
+      mirror_tension: facData.mirror,
+      realism_judged: facData.realism,
+      failure_logs: facData.failures,
+      dark_needs_consented: facData.darkNeeds,
+      enough_definition: facData.enough,
+      final_biggest_need: facData.finalNeed,
+      session_outcome: facData.outcome,
+      facilitator_reflexivity: facData.reflexivity,
+      participant_tree: mumData
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `TON_${facData.participant || 'Session'}.json`);
+    document.body.appendChild(downloadAnchorNode); 
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  }
+
+  function startApp(role) {
+    document.getElementById('intro-screen').style.display = 'none';
+    loadData();
+    
+    if (role === 'mum') {
+      document.getElementById('mum-view').style.display = 'block';
+      renderMumView();
+    } else {
+      document.getElementById('facilitator-view').style.display = 'block';
+      renderFacilitatorNav();
+      loadPhase(0); 
+      populateFacInputs();
+    }
+  }
+
+  function loadMumData() {
+    const savedMum = localStorage.getItem('strictMumData');
+    if (savedMum) {
+      const m = JSON.parse(savedMum);
+      const output = `
+--- PARTICIPANT TREE DATA ---
+Roots: ${m.roots || '[Empty]'}
+Trunk: ${m.trunk || '[Empty]'}
+Branches: ${m.branches || '[Empty]'}
+Leaves: ${m.leaves || '[Empty]'}
+Fruits: ${m.fruits || '[Empty]'}
+Doesn't fit anywhere: ${m.misfit || '[Empty]'}
+Dark Needs Chosen: ${m.darkNeeds ? m.darkNeeds.join(", ") : '[None]'}
+      `;
+      alert(output);
+    } else {
+      alert("No participant data found yet.");
+    }
+  }
+
+  function populateFacInputs() {
+    if (facData.participant) document.getElementById('input-participant').value = facData.participant;
+    if (facData.whyToday) document.getElementById('input-why-today').value = facData.whyToday;
+    if (facData.biggestNeed) document.getElementById('input-biggest-need').value = facData.biggestNeed;
+    if (facData.usefulOutcome) document.getElementById('input-useful-outcome').value = facData.usefulOutcome;
+    if (facData.softDive) document.getElementById('input-soft-dive').value = facData.softDive;
+    if (facData.mirror) document.getElementById('input-mirror').value = facData.mirror;
+    if (facData.realism) document.getElementById('input-realism').value = facData.realism;
+    if (facData.failures) document.getElementById('input-failures').value = facData.failures;
+    if (facData.darkNeeds) document.getElementById('input-dark-needs').value = facData.darkNeeds;
+    if (facData.enough) document.getElementById('input-enough').value = facData.enough;
+    if (facData.finalNeed) document.getElementById('input-final-need').value = facData.finalNeed;
+    if (facData.outcome) document.getElementById('input-outcome').value = facData.outcome;
+    if (facData.reflexivity) document.getElementById('input-reflexivity').value = facData.reflexivity;
+  }
+
+  function renderMumView() {
+    const container = document.getElementById('mum-tree-container');
+    container.innerHTML = '';
+    
+    LAYERS.forEach(layer => {
+      const div = document.createElement('div');
+      div.className = 'layer-block';
+      div.style.setProperty('--layer-color', layer.color);
+      
+      div.innerHTML = `
+        <h3>${layer.name}</h3>
+        <div class="layer-desc">${layer.desc}</div>
+        <textarea id="mum-${layer.id}" placeholder="Type what belongs here..." oninput="saveMumData()">${mumData[layer.id] || ''}</textarea>
+      `;
+      container.appendChild(div);
+    });
+    
+    document.getElementById('mum-misfit').value = mumData.misfit || '';
+  }
+
+  function showDarkNeeds() {
+    document.getElementById('mum-main').style.display = 'none';
+    document.getElementById('mum-dark-needs').style.display = 'block';
+    
+    const container = document.getElementById('dark-needs-list');
+    container.innerHTML = '';
+    
+    DARK_NEEDS.forEach(dn => {
+      const div = document.createElement('div');
+      div.className = 'dark-need-card';
+      
+      const isSelected = mumData.darkNeeds.find(d => d.id === dn.id);
+      
+      div.innerHTML = `
+        <h3>${dn.title}</h3>
+        <p>${dn.desc}</p>
+        ${isSelected ? 
+          `<div style="border-top:1px solid #2B3B4A; padding-top:20px; margin-top:20px;">
+            <p style="font-size:0.9rem; color:var(--warn); margin-bottom:12px;"><strong>Shadow side:</strong> ${dn.shadow}</p>
+            <p style="font-size:0.9rem; color:var(--cyan); margin-bottom:16px;"><strong>Integrated side:</strong> ${dn.integrated}</p>
+            <input type="text" placeholder="Write your own version of this behaviour..." value="${isSelected.custom || ''}" oninput="saveDarkNeed('${dn.id}', this.value)">
+           </div>` : 
+          `<button class="btn small o" style="border-color:var(--gold); color:var(--gold);" onclick="toggleDarkNeed('${dn.id}')">This is me</button>`
+        }
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function toggleDarkNeed(id) {
+    if (mumData.darkNeeds.length >= 2) {
+      alert("Please select only the 2 that resonate most.");
+      return;
+    }
+    mumData.darkNeeds.push({ id: id, custom: "" });
+    saveMumData();
+    showDarkNeeds();
+  }
+
+  function saveDarkNeed(id, val) {
+    const item = mumData.darkNeeds.find(d => d.id === id);
+    if (item) item.custom = val;
+    saveMumData();
+  }
+
+  function finishMumData() {
+    let enoughDef = prompt("What does 'enough' look like for you this season?");
+    if (enoughDef) mumData.enough = enoughDef;
+    
+    let failure = prompt("What did this framework get wrong today? (Optional)");
+    if (failure) mumData.failureLog = failure;
+    
+    document.getElementById('mum-dark-needs').style.display = 'none';
+    document.getElementById('mum-certificate').style.display = 'block';
+    renderCertificate();
+  }
+
+  function renderCertificate() {
+    let treeHtml = '';
+    LAYERS.forEach(l => {
+      if (mumData[l.id]) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:${l.color}">${l.name}:</strong> ${mumData[l.id]}</p>`;
+    });
+    if (mumData.misfit) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:var(--warn)">Misfit:</strong> ${mumData.misfit}</p>`;
+    
+    document.getElementById('cert-tree').innerHTML = treeHtml;
+    document.getElementById('cert-enough').innerText = mumData.enough || "[Not defined]";
+  }
+
+  function openCert() {
+    let treeHtml = '';
+    LAYERS.forEach(l => {
+      if (mumData[l.id]) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:${l.color}">${l.name}:</strong> ${mumData[l.id]}</p>`;
+    });
+    if (mumData.misfit) treeHtml += `<p style="margin-bottom:8px;"><strong style="color:var(--warn)">Misfit:</strong> ${mumData.misfit}</p>`;
+    
+    document.getElementById('cert-tree-modal').innerHTML = treeHtml;
+    document.getElementById('cert-enough-modal').innerText = mumData.enough || "[Not defined]";
+    document.getElementById('cert-failure-modal').innerText = mumData.failureLog || "[None noted]";
+    
+    document.getElementById('cert-modal').classList.add('show');
+  }
+
+  function flipCert() {
+    document.querySelector('.cert-front').classList.toggle('active');
+    document.querySelector('.cert-back').classList.toggle('active');
+  }
+
+  const PHASES = [
+    { id: 0, title: "Before the call", script: "No participant-facing script. Open Airtable. Confirm participant code, signed consent, recording/photo permissions. Open Tree app. Set calm tone.", data: "Confirm records; check permissions." },
+    { id: 1, title: "1. The Gate", script: "Hi [Name]. Thanks for making the time today. I know with a 2-year-old and two older kids, your time is basically a luxury right now.<br><br>Before we start, I want to remind you that this is a guided reflection, not therapy or diagnosis. You can skip any question, change your mind, or stop at any time. If anything feels too heavy, we pause.<br><br>Are you still happy to take part today? And are you comfortable with me recording this session? You can say no to recording without having to explain why.", data: "Consent reconfirmed at session; Recording used?; Safety Pause." },
+    { id: 2, title: "2. Baseline", script: "1. 'Why do you want to do this today?'<br>2. 'Before we start, what do you think your biggest need is right now?'<br>3. 'If this session is useful, what would be different for you afterward—not in your whole life, but in one small, observable way?'", data: "Capture Baseline — Why today?, Biggest need, Useful outcome (verbatim)." },
+    { id: 3, title: "3. Soft Dive", script: "'Let's start with the lighter stuff. Looking at these cards—Connection, Play, Recognition, Rest—which ones feel most present in your life right now? And which feel missing?'<br><br>'We can stay here, or we can look at the heavier stuff—Roots and Trunk: safety, stability, identity. You choose. There is no correct order.'", data: "Soft Dive choice; Tree map placements." },
+    { id: 4, title: "4. Build the Tree", script: "'The Tree is not a ladder. You don't have to fix the bottom first. A tree can survive with damaged roots if the trunk is strong. There is no balanced tree. Today's tree only needs to be honest.'<br><br>'Where do you feel strain, growth, protection, or possibility today?'<br><br>'This is one way of organising needs. You can disagree with the structure, place something in more than one area, or tell me it doesn't fit anywhere.'", data: "Framework Fit Observed; Tree map placements." },
+    { id: 5, title: "5. The Mirror", script: "'I noticed you placed [X] here, but earlier you mentioned [Y]. I'm not saying this is wrong. I'm curious: how do these live together in your life?'<br><br>'Does this feel like a problem to solve, a tension to hold, or something else?'", data: "Participant explanation; Tension confirmed/rejected." },
+    { id: 6, title: "6. The Falsification", script: "'We're going to look at what's destabilizing you right now, but let's not use the word emergency. What would you call it?'<br><br>'Do you agree with what the framework suggests is your priority? Is it realistic for your actual life?'<br><br>If not realistic: 'Thank you for telling me. What would need to be true for this to become realistic? What constraint is the framework not seeing?'", data: "Framework Fit Observed; Realism Judged; Failure Logs." },
+    { id: 7, title: "7. The Flinch", script: "'There is a harder section about needs that can look ugly from the outside: control, anger, attention, avoidance. These are not bad needs. They are often protections. We put this last because it can be uncomfortable. Do you want to go there?'<br><br>If yes: 'Where does this show up in your tree? What is it protecting? What does it cost you?'<br><br>If no: 'That's completely fine. We don't need to go there.'", data: "Dark Needs Consented (Yes/No/Not offered/Unclear)." },
+    { id: 8, title: "8. The Anchor", script: "'This tree is not a project to perfect. What would enough look like for you this season—not perfect, not permanently fixed, but enough?'<br><br>Optional: 'How would you recognise that in everyday life?'", data: "Enough Definition (verbatim)." },
+    { id: 9, title: "9. The Certificate", script: "'Please note anything that did not fit, felt unhelpful, was missing, or could be improved. It is also okay if nothing comes to mind. Honest feedback is useful whether positive, negative or mixed.'", data: "Failure Logs; Session Outcome." },
+    { id: 10, title: "10. The Return", script: "'At the start, you said your biggest need was ____. What do you say now?'<br><br>'If your answer changed, what changed in how you see it?'<br><br>'If it did not change, did the session confirm something you already knew, deepen it, or leave it untouched?'<br><br>Close: 'Thank you. I will reach out in 3 months to see how your tree is growing. Remember, this is a practice, not a test.'", data: "Final — Biggest need; Final — Useful outcome; End-of-session interpretation." },
+    { id: 11, title: "After the call", script: "Ask yourself: 'Where did I lead her?' 'What did I feel defensive about?' 'What did I want her to say?' 'What did I notice in her body language?' 'Which questions did I rephrase or skip?'", data: "Facilitator Reflexivity Note; Session Data Completeness; Follow-up needed." }
+  ];
+
+  function renderFacilitatorNav() {
+    const nav = document.getElementById('phase-nav');
+    nav.innerHTML = '';
+    PHASES.forEach((p, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'phase-btn';
+      btn.id = `nav-btn-${index}`;
+      btn.innerText = p.title.split('.')[0]; 
+      btn.onclick = () => loadPhase(index);
+      nav.appendChild(btn);
+    });
+  }
+
+  function loadPhase(index) {
+    document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.getElementById(`nav-btn-${index}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const phase = PHASES[index];
+    const content = document.getElementById('protocol-content');
+    
+    content.innerHTML = `
+      <h2 style="color: var(--gold-light); margin-bottom: 20px;">${phase.title}</h2>
+      
+      <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; color: var(--mute); margin-bottom: 8px;">Script / Action</div>
+      <div class="script-box">${phase.script}</div>
+      
+      <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; color: var(--mute); margin-bottom: 8px;">Data to capture</div>
+      <p style="font-size: 0.95rem; margin-bottom: 32px; color: var(--cyan);">${phase.data}</p>
+      
+      <div style="display:flex; gap:12px;">
+        ${index > 0 ? `<button class="btn o small" onclick="loadPhase(${index-1})">Back</button>` : ''}
+        ${index < PHASES.length-1 ? `<button class="btn small" onclick="loadPhase(${index+1})">Next Phase</button>` : ''}
+      </div>
+    `;
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'strictMumData') {
+      loadData();
+      if(document.getElementById('mum-view').style.display === 'block') {
+        if(document.getElementById('mum-main').style.display === 'block') renderMumView();
+      }
+    }
+  });
+
+</script>
+</body>
+</html>
